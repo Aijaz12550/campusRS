@@ -1,27 +1,145 @@
 import React , { Component } from 'react'
 import {
-View, Text, TouchableOpacity, TextInput, StyleSheet
+View, Text, TouchableOpacity, TextInput, StyleSheet, ScrollView, Dimensions,ProgressBarAndroid,StatusBar
 } from "react-native"
+import ip from './ip'
+import { DrawerActions } from 'react-navigation-drawer';
 
-const Login = () => {
+import Modal from 'react-native-modal'
+// redux
+import { connect } from 'react-redux'
+import { Add_User, Remove_User } from '../store/actions/index'
+
+class Login extends Component {
+state={
+    
+}
+    static navigationOptions = {
+        header: null,
+        drawerLockMode: 'locked-closed',
+        disableGestures: true,
+        data:[],
+      };
+      componentDidMount(){
+          this.setState({
+              HEIGHT:Dimensions.get('window').height
+          })
+      }
+
+      
+    _signin(){
+        console.log('chala')
+        let { email,password } = this.state
+        fetch(`http://${ip}:3000/users/login`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email,password })
+      }).then(user=>user.json())
+      .then(data=>{
+          if(data.message){
+              this.setState({error:data.message})
+          }
+          else if(data._id){
+              console.log('>>>>>>>>>>>>>>',data)
+              this.props.add_user(data)
+            //   this.props.navigation.navigate('Home')
+          }
+      })
+      }
+      
+render(){
+console.log('login~~~this.props',this.props)
     return(
-        <View style={styles.container}>
 
-            <TextInput/>
-            <TextInput/>
+<ScrollView centerContent={true} >
+            <View style={[styles.container]}>
+                <StatusBar backgroundColor="#ef5350" barStyle="light-content" />
+            
 
-            <TouchableOpacity>
-                <Text>Submit</Text>
+            <Text style={{color:'white',fontSize:20,alignSelf:'center'}}>Login</Text>
+
+            <TextInput onChangeText={(v)=>this.setState({email:v})} style={styles.input} placeholder="Email"/>
+            <TextInput onChangeText={(v)=>this.setState({password:v})} style={styles.input} placeholder="passwword" secureTextEntry />
+
+            <TouchableOpacity onPress={()=>this._signin()} style={styles.btn}>
+                <Text style={styles.btnText} >Submit</Text>
             </TouchableOpacity>
+
+            <View style={{display:'flex',flexDirection:"row", justifyContent:'center',marginTop:40}}>
+            <Text style={{color:'white',fontSize:15,alignSelf:'center',marginBottom:60}}>Don't have any acoount? </Text>
+            <TouchableOpacity onPress={()=>this.props.navigation.navigate('SignUp')}>
+            <Text style={{color:'#ffcdd2',fontSize:18,alignSelf:'center',marginBottom:60,}}>Sign Up</Text>
+            </TouchableOpacity>
+            </View>
+
+
         </View>
+</ScrollView>
+
     )
+}
 }
 
 const styles = StyleSheet.create({
     container:{
         flex:1,
-        backgroundColor:'coral',
-    }
+        backgroundColor:'#ef5350',
+        justifyContent:'center',
+        height:Dimensions.get('window').height
+    }, modal:{
+        margin:0,
+        flex:1
+    },
+    input:{
+        backgroundColor:'white',
+        width:300,
+        height:45,
+        margin:20,
+        borderRadius:5,
+        alignSelf:'center',
+        fontSize:16,
+    },
+//     btn:{
+// backgroundColor:'#ffcdd2',
+// padding:10,
+// width:150,
+// alignSelf:'center',
+// borderRadius:5,
+
+//     },
+//     btnText:{
+//         color:'black',
+//         alignSelf:'center'
+//     }
+btn:{
+    backgroundColor:'white',
+    height:40,
+    margin:20,
+    borderBottomEndRadius:30,
+    borderTopStartRadius:30,
+    justifyContent:'center',
+    maxWidth:140,
+    alignSelf:'center',
+    width:'100%',
+    marginTop:30
+},
+btnText:{
+    alignSelf:'center',
+    color:'#ef5350'
+},
 })
 
-export default Login;
+const mapStateToProps = state =>{
+    return{
+        user : state.user
+    }
+}
+
+const mapDispatchToProps = dispatch =>{
+    return{
+        add_user : (user)=>dispatch(Add_User(user))
+    }
+}
+export default connect(mapStateToProps,mapDispatchToProps)(Login)
