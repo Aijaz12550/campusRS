@@ -141,7 +141,7 @@ const DATA = [
                       }
 
         data={companies}
-        renderItem={({ item }) => <TouchableOpacity style={[styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} onPress={()=>this.props.navigation.dispatch(DrawerActions.openDrawer())}>
+        renderItem={({ item }) => <TouchableOpacity style={[styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} >
         <View style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:10}}>
             <Text style={{fontSize:16,fontWeight:'bold',color:"#ef5350"}}>{item.companyName}</Text>
         </View>
@@ -150,9 +150,9 @@ const DATA = [
             <Text style={{fontSize:16,fontWeight:'bold'}}>History :</Text>
             <View>
             <Text >Added On : 23/11/19</Text>
-        <Text>Total Jobs Posted : {item.Jobs.length}</Text>
+        {/* <Text>Total Jobs Posted : {item.Jobs.length}</Text> */}
             <Text>Total Hired : 10</Text>
-            <Text style={{color:'#296'}}>Active Jobs : 3</Text>
+                    <Text style={{color:'#296'}}>Active Jobs : {item.activeJobs.length}</Text>
         </View>
 
 

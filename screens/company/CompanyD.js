@@ -64,9 +64,9 @@ import img from './image'
  <Text style={{color:'white',fontSize:16}} >Registration Date : {this.props.item.timestamp}</Text>
  <Text style={{color:'white',fontSize:16}} >Location : {this.props.item.location}</Text>
  <Text style={{color:'white',fontSize:16}} >Total employees : {this.props.item.totalEmployees}</Text>
-        <Text style={{color:'white',fontSize:16}}>Total Jobs Posted : {this.props.item.Jobs.length}</Text>
+        <Text style={{color:'white',fontSize:16}}>Total Jobs Posted : {this.props.item.activeJobs.length}</Text>
             <Text style={{color:'white',fontSize:16}}>Total Hired : 10</Text>
- <Text style={{color:'#255',fontSize:16}}>Active Jobs : {this.props.item.Jobs.length - this.props.item.closeJobs.length }</Text>
+ <Text style={{color:'#255',fontSize:16}}>Active Jobs : {this.props.item.activeJobs.length - this.props.item.closeJobs.length }</Text>
  <Text style={{color:'yellow',fontSize:16}}>Closed Jobs : {this.props.item.closeJobs.length}</Text>
         </View>
 

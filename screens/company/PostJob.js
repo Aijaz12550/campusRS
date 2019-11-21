@@ -59,6 +59,7 @@ import ip from '../ip'
  }
 
  async _addjob(){
+     let { title, salary,experience, positions, skills, jobType, qualification, res  } = this.state
      console.log("~~~chala~~~")
      let _id = this.props.navigation.getParam("owner");
      await fetch(`http://${ip}:3000/company/addjob`,{
@@ -68,25 +69,40 @@ import ip from '../ip'
              "authorization":`Bearer ${this.props.user.token}`
          },
          body:JSON.stringify({
-             _id,job:{
-
-                 id:"String",
-            timestamp:"String",
-            job_detail:{
-                title:"String",
-                required_qualification:"String",
-                experience:"String",
-                skills:"String",
-                positions:4,
-                job_type:"String",
-                salary:20000,
-                job_responsibility:"String",
+          
+                 job_detail:{
+                    cId:_id,
+                    timestamp:new Date().getTime(),
+                title:title,
+                required_qualification:qualification,
+                experience:experience,
+                skills:skills,
+                positions:positions,
+                job_type:jobType,
+                salary:salary,
+                job_responsibility:res,
             },
-        }
+      
          })
      }).then(res=>res.json())
      .then(result=>{
-         console.log("~~~Add Job~~~",result)
+         
+         if(result.result){
+             console.log('~~~r.r~~',result.result)
+             fetch(`http://${ip}:3000/company/updateCompany`,{
+                method:"POST",
+                headers:{
+                    "Content-Type":'application/json',
+                    "authorization":`Bearer ${this.props.user.token}`
+                },
+                body:JSON.stringify({id:_id, jobId:result.result._id})
+            }).then( r => r.json())
+            .then( data => {
+                console.log('data',data)
+                this.props.navigation.navigate('Home')
+            })
+         }
+         
      })
  }
 
@@ -105,43 +121,43 @@ import ip from '../ip'
 <Form>
             <Item floatingLabel>
               <Label style={{color:'white',fontSize:14}}>Job Title</Label>
-              <Input  maxLength={25}/>
+              <Input onChangeText={v=>this.setState({title:v})}  maxLength={25}/>
             </Item>
 
             <Item floatingLabel>
               <Label style={{color:'white',fontSize:14}}>Qualification Required</Label>
-              <Input maxLength={25} />
+              <Input onChangeText={v=>this.setState({qualification:v})} maxLength={25} />
             </Item>
 
             <Item floatingLabel>
               <Label style={{color:'white',fontSize:14}}>Experience</Label>
-              <Input keyboardType="number-pad" maxLength={4} />
+              <Input onChangeText={v=>this.setState({experience:v})} keyboardType="number-pad" maxLength={4} />
             </Item>
 
             <Item floatingLabel>
               <Label style={{color:'white',fontSize:14}}>Skills Required</Label>
-              <Input maxLength={10} />
+              <Input onChangeText={v=>this.setState({skills:v})} maxLength={10} />
             </Item>
             
             <Item floatingLabel>
               <Label style={{color:'white',fontSize:14}}>Vacant Positions</Label>
-              <Input maxLength={10} />
+              <Input onChangeText={v=>this.setState({positions:v})} maxLength={10} />
             </Item>
 
             <Item floatingLabel>
               <Label style={{color:'white',fontSize:14}}>Job Type</Label>
-              <Input maxLength={10} />
+              <Input onChangeText={v=>this.setState({jobType:v})} maxLength={10} />
             </Item>
 
             <Item floatingLabel>
               <Label style={{color:'white',fontSize:14}}>Salary Package</Label>
-              <Input maxLength={10} />
+              <Input onChangeText={v=>this.setState({salary:v})} maxLength={10} />
             </Item>
 
 
             <Item floatingLabel>
               <Label style={{color:'white',fontSize:14}}>Job Responsibilty</Label>
-              <Input multiline={true} maxLength={100} />
+              <Input onChangeText={v=>this.setState({res:v})} multiline={true} maxLength={100} />
             </Item>
 
             

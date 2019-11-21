@@ -61,6 +61,7 @@ import ip from '../ip'
 //  ---------------------------------------------------------------------------
 
  async _addCompany(){
+     let { cname,ser,des,emp,loc, } = this.state
      let timestamp = new Date().getTime()
      console.log('chala..')
      await fetch(`http://${ip}:3000/company/addCompany`,{
@@ -70,11 +71,11 @@ import ip from '../ip'
              "authorization":`Bearer ${this.props.user.token}`
          },
          body:JSON.stringify({
-            companyName :"Future",
-            service:"Software Development",
-            totalEmployees:20,
-            location:"Karachi",
-            description:"We are working on following technology from 10 years..",
+            companyName :cname,
+            service:ser,
+            totalEmployees:emp,
+            location:loc,
+            description:des,
             ownerId:this.props.user._id,
             timestamp,
          })
@@ -101,29 +102,29 @@ import ip from '../ip'
 <Form>
             <Item floatingLabel>
               <Label style={{color:'white',fontSize:14}}>Company Name</Label>
-              <Input  maxLength={25}/>
+              <Input onChangeText={(v)=>this.setState({cname:v})}  maxLength={25}/>
             </Item>
 
             <Item floatingLabel>
               <Label style={{color:'white',fontSize:14}}>Main Service of Company</Label>
-              <Input maxLength={25} />
+              <Input onChangeText={(v)=>this.setState({ser:v})} maxLength={25} />
             </Item>
 
             <Item floatingLabel>
               <Label style={{color:'white',fontSize:14}}>No Of Employees Working</Label>
-              <Input keyboardType="number-pad" maxLength={4} />
+              <Input onChangeText={(v)=>this.setState({emp:v})} keyboardType="number-pad" maxLength={4} />
             </Item>
 
             <Item floatingLabel>
               <Label style={{color:'white',fontSize:14}}>Location (Karachi e.t.c)</Label>
-              <Input maxLength={10} />
+              <Input onChangeText={(v)=>this.setState({loc:v})} maxLength={10} />
             </Item>
             
 
             <Item floatingLabel>
               
             <Label style={{color:'white',fontSize:14}}>Description</Label>
-              <Input multiline={true} maxLength={100} style={{maxHeight:150}} />
+              <Input onChangeText={(v)=>this.setState({des:v})} multiline={true} maxLength={100} style={{maxHeight:150}} />
             </Item>
           </Form>
                

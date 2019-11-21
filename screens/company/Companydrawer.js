@@ -3,11 +3,19 @@ import { View, Text,StyleSheet,TouchableHighlight,TouchableOpacity,Image,ScrollV
 import { DrawerActions } from 'react-navigation-drawer';
 
 
+// redux..
+import { connect } from 'react-redux'
+import { Remove_User } from '../../store/actions/index'
+
  class DrawerContent extends Component {
 state ={
     company:['Add New Job','Open Jobs','Closed Jobs'],
     Student :['My Jobs', 'My Profile'],
     Admin:['Companies','Students']
+}
+
+_signout(){
+    this.props.signout()
 }
   
     render() {
@@ -39,16 +47,14 @@ state ={
 
 
                      
-
-                     
                     {/* _____________________________________________________________________ */}
                     <View style={styles.line}></View>
-                    <TouchableHighlight  underlayColor={'rgba(0,0,0,0.2)'}>
+                    <TouchableOpacity onPress={()=>this._signout()} underlayColor={'rgba(0,0,0,0.2)'}>
                         <View style={styles.row}>
                        
                         <Text  style={styles.text}>SignOut</Text>
                         </View>
-                    </TouchableHighlight>
+                    </TouchableOpacity>
                 </ScrollView>
                 </TouchableOpacity>
             </TouchableOpacity>
@@ -111,4 +117,10 @@ const styles = StyleSheet.create({
         margin:15,
     }
 })
-export default DrawerContent;
+const mapDispatchToProps = dispatch => {
+    return {
+        signout : ()=>dispatch(Remove_User())
+    }
+}
+export default  connect(null,mapDispatchToProps)(DrawerContent)
+// export default DrawerContent;

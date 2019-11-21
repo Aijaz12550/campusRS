@@ -7,17 +7,16 @@ StyleSheet,SafeAreaView,Dimensions,ScrollView,StatusBar, FlatList, ListItem, Ref
 import Modal from 'react-native-modal'
 import { DrawerActions } from 'react-navigation-drawer';
 import { connect } from 'react-redux'
-// import { Add_User,Remove_User} from '../store/actions/index'
-import { Add_User,Remove_User} from '../../store/actions/index'
-import ip from '../ip'
+
+import { Add_User, Remove_User } from '../../../store/actions/index'
+import ip from '../../ip'
 import { Banner, Card } from 'react-native-paper'
 import { FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
-import { faBackward, faArrowLeft } from "@fortawesome/free-solid-svg-icons"
-import img from './image'
+import { faBackward, faArrowLeft, faArrowAltCircleDown } from "@fortawesome/free-solid-svg-icons"
+import img from '../image'
 
 
-
- class Jobs extends Component {
+ class Pending extends Component {
     state={
         login:false,main:true,
         WIDTH:300,refreshing:false, setRefreshing:false
@@ -33,71 +32,55 @@ import img from './image'
 
    _onRefresh = () => {
     this.setState({refreshing: true});
-   
+    this._myCompanies()
     setTimeout(()=>{
         this.setState({refreshing: false})
     },10000)
   }
 
-  /**
-   *[{"__v": 0, "_id": "5dd55eaca2236f0478c45d85", "actions": [], "applications": [], 
-   "cId": "5dd553c6be5a8d207c2486b2", "experience": "646", "hired": [], "job_responsibility": "Hdhd", "job_type": "Gdh", 
-   "positions": "Gdhdh", "required_qualification": "Gshss", "salary": "Gdh", "skills": "Gxgx", "timestamp": "1574264493096", "title": "Teud"},
-   */
     render(){
         let { login,main, companies,refreshing, setRefreshing } = this.state
  
-  console.log('~~from job.js~~~ this.props.jobs~~~~',this.props.jobs)
+  
         return(
 
-            <View style={{flex:1,backgroundColor:'#ef5350',justifyContent:'center',alignItems:'center'}}>
+            <View style={{flex:1,backgroundColor:'lightgray'}}>
 
-<StatusBar backgroundColor="#ef5350" barStyle="light-content" />
+<View style={{flex:1,justifyContent:'flex-start',alignItems:'center'}}>
 
-<FlatList
-                       refreshControl={
-                        <RefreshControl
-                          refreshing={this.state.refreshing}
-                          onRefresh={this._onRefresh}
-                        />
-                      }
-
-        data={this.props.jobs}
-        renderItem={({ item }) => <TouchableOpacity style={[styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} onPress={()=>this.props.navigation.dispatch(DrawerActions.openDrawer())}>
-        <View style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:10}}>
-            <Text style={{fontSize:16,fontWeight:'bold',color:"white"}}>{item.title}</Text>
+    <TouchableOpacity style={[styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} >
+    <View style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:10}}>
+            <Text style={{fontSize:16,fontWeight:'bold',color:"white"}}>Aijaz Abasi</Text>
         </View>
-
         <View style={{borderBottomColor:"#eee",borderBottomWidth:1,paddingBottom:5}}> 
-            <Text style={{fontSize:16,fontWeight:'bold',color:'white'}}>Detail :</Text>
+            <Text style={{fontSize:16,fontWeight:'bold',color:'white'}}>Experience : </Text>
             <View>
-                    <Text style={{color:'white'}}>Added  : {item.timestamp}</Text>
-            <Text style={{color:'white'}}>Total Applicants : {item.applications.length}</Text>
-                    <Text style={{color:'white'}}>Total Hired : {item.hired.length}</Text>
-                    <Text style={{color:'white'}} numberOfLines={3}>Job Responsibility : {item.job_responsibility}</Text>
-            
+ <Text style={{color:'white',fontSize:16}} >Qualification : </Text>
+ 
         </View>
 
-
-        </View>
-        <View style={{display:'flex',flexDirection:'row',justifyContent:'space-between',alignItems:'space-between',marginTop:10}}>
+        <View style={{display:'flex',flexDirection:'row',justifyContent:'flex-end',alignItems:'space-between'}}>
             
-            <TouchableOpacity onPress={()=>this.props.navigation.navigate('PostJob',{owner:item._id})}>
-            <Text style={{fontSize:16,fontWeight:'bold',color:"yellow"}}>Close</Text>
+
+            <TouchableOpacity  >
+            <FontAwesomeIcon color="white" icon={faArrowAltCircleDown} />
             </TouchableOpacity>
+            
+        </View>
 
-            <TouchableOpacity onPress={()=>this.props.navigation.navigate("JobDetail",{job:item})} >
-            <Text style={{fontSize:16,fontWeight:'bold',color:"navy"}}> Detail</Text>
+        </View>
+        <View style={{display:'flex',flexDirection:'row',justifyContent:'flex-end',alignItems:'space-between',marginTop:10}}>
+            
+            <TouchableOpacity  >
+            <Text style={{fontSize:16,fontWeight:'bold',color:"navy"}}> Select</Text>
             </TouchableOpacity>
             
         </View>
 
         
     </TouchableOpacity>
-    }
-        keyExtractor={item => item._id}
-      />
-                  
+</View>
+  
             </View>
            
         )
@@ -165,19 +148,18 @@ const styles = StyleSheet.create({
 
     },
     card:{
-        backgroundColor:'#ef5350',
+        backgroundColor:'#ffab00',
         margin:10,
         padding:10,
         borderRadius:5,
         borderColor:"white",
-        borderWidth:1,
         minHeight:100,
         maxHeight:500,
         shadowColor: '#000',
     // shadowOffset: { width: 10, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
-    elevation: 20,
+    elevation: 10,
         
     }
 })
@@ -193,4 +175,4 @@ const mapDispatchToProps = dispatch =>{
         add_user : (user)=>dispatch(Add_User(user))
     }
 }
-export default connect(mapStateToProps,mapDispatchToProps)(Jobs)
+export default connect(mapStateToProps,mapDispatchToProps)(Pending)

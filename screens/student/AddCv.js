@@ -9,6 +9,7 @@ import { connect } from 'react-redux'
 // import { Add_User,Remove_User} from '../store/actions/index'
 import { Add_User,Remove_User} from '../../store/actions/index'
 import { Picker, Icon } from 'native-base'
+import ip from '../ip'
 
 
 
@@ -17,8 +18,8 @@ import { Picker, Icon } from 'native-base'
     state={
         login:false,main:true,
         WIDTH:300,
-        personalDetail:true,
-        educationalDetail:true,
+        personalDetail:false,
+        educationalDetail:false,
         desL:0,
         pd:false,
 
@@ -27,6 +28,8 @@ import { Picker, Icon } from 'native-base'
         degree:null,
 
         experience:[],index:0, duration:null,designation:null,organization:null,
+        
+        skills:null,
     }
 
 
@@ -49,20 +52,20 @@ import { Picker, Icon } from 'native-base'
             <TouchableOpacity onPress={()=>navigation.dispatch(DrawerActions.toggleDrawer())}
              style={{ display:'flex',flexDirection:'column',marginLeft:10,alignSelf:"center",}}>
 
-        <Text style={{  width:30,height:3,backgroundColor:'#ef5350',alignSelf:"center", marginBottom:4.5}}></Text>
-        <Text style={{  width:30,height:3,backgroundColor:'#ef5350',alignSelf:"center", marginBottom:4.5}}></Text>
-        <Text style={{  width:30,height:3,backgroundColor:'#ef5350',alignSelf:"center", marginBottom:4.5}}></Text>
+        <Text style={{  width:30,height:3,backgroundColor:'white',alignSelf:"center", marginBottom:4.5}}></Text>
+        <Text style={{  width:30,height:3,backgroundColor:'white',alignSelf:"center", marginBottom:4.5}}></Text>
+        <Text style={{  width:30,height:3,backgroundColor:'white',alignSelf:"center", marginBottom:4.5}}></Text>
          </TouchableOpacity>,
     //   toggle end
 
         headerStyle: {
-            backgroundColor:'white'
+            backgroundColor:'#ef5350'
             // backgroundColor: '#946638',
         },
-        headerTintColor: '#ef5350',
+        headerTintColor: 'white',
         headerTitleStyle: {
             fontWeight: 'bold',
-            color:'#ef5350'
+            color:'white'
         },
     }
  };
@@ -133,10 +136,56 @@ _more(){
 }
 
 
-// ---------------------------------------------
-_done(){
-    
+// ---------------------------------------------Add CV
+ async _addcv(){
+     let {
+         name,
+         des,
+         degree,
+         year,month,day,
+         skills,
+         experience
+     } = this.state
+    await fetch(`http://${ip}:3000/users/addcv`,{
+        method:'POST',
+        headers:{
+            "Content-Type" : 'application/json',
+            authorization:`Bearer ${this.props.user.token}`
+        },
+        body:JSON.stringify({
+            id:this.props.user._id,
+            cv:{
+                name,
+                des,
+                degree,
+                year,
+                skills,
+                experience,
+            }
+        })
+
+    })
+    .then( res => res.json() )
+    .then( result => console.log('~~~//',result))
+    .catch( e => console.log('~~error~~~',e))
 }
+// ---------------------end
+
+
+// -------------------------_done()
+ _done(){
+    let { index, duration, designation, organization, experience} = this.state;
+    if(duration && designation && organization){
+        experience[index] = {duration, designation, organization}
+        this.setState({experience,personalDetail:false,educationalDetail:false})
+        setTimeout(()=>{
+            this._addcv()
+        },2000)
+    }else{
+        this._addcv()
+        this.setState({personalDetail:false,educationalDetail:false})
+    }
+ }
 
     render(){
         let { login,main,
@@ -299,16 +348,11 @@ _done(){
                    <View style={{display:'flex',flexDirection:'row',justifyContent:'flex-end',alignItems:'flex-end',marginTop:10}}>
                        
 
-{experience.length ?
-                       <TouchableOpacity onPress={()=>this.props.navigation.navigate('PostJob')}>
-                       <Text style={{fontSize:16,fontWeight:'bold',color:"navy"}}>Done</Text>
-                       </TouchableOpacity>
-                    :
 
-                       <TouchableOpacity onPress={()=>this.props.navigation.navigate('PostJob')}>
+                       <TouchableOpacity onPress={()=>this._done()}>
                        <Text style={{fontSize:16,fontWeight:'bold',color:"navy",opacity:0.3}}>Done</Text>
                        </TouchableOpacity>
-                    }
+                
                        
                    </View>
 
@@ -337,7 +381,7 @@ _done(){
 const styles = StyleSheet.create({
     container:{
         flex:1,
-        backgroundColor:'#ef5350',
+        backgroundColor:'lightgray',
         justifyContent:'center',
         alignItems:'center'
     },
@@ -429,3 +473,23 @@ const mapDispatchToProps = dispatch =>{
     }
 }
 export default connect(mapStateToProps,mapDispatchToProps)(AddCv)
+
+
+/**
+ * 
+ *  async _getAll(){
+      await fetch(`http://${ip}:3000/company/allcompanies`,{
+          method:"GET",
+          headers:{
+              "Content-Type":'application/json',
+              authorization:`Bearer ${this.props.user.token}`
+          }
+      })
+      .then(res=>res.json())
+      .then(data=>{
+          this.setState({comps:data.result})
+          console.log("~~comp~~",data)
+        })
+      .catch(e=>{console.log('~~err~~',e)})
+  }
+ */

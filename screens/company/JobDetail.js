@@ -13,8 +13,9 @@ import { BottomNavigation, Text, } from 'react-native-paper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faAddressBook, faHome, faMale,  faDoorClosed,faArrowLeft, faCheck, faList, faThList,faPaperPlane, faFlagCheckered } from '@fortawesome/free-solid-svg-icons'
 import img from './image'
-import Company from './CompanyD'
-import JObs from './Job'
+import Pending from './jobs/pending'
+import ShortList from './jobs/shortlisted'
+import Selected from './jobs/selected'
 
 
 const MusicRoute = () => <Text style={[ { backgroundColor: '#673ab7',flex:1 }]}>Music</Text>;
@@ -73,16 +74,16 @@ const RecentsRoute = () => <Text>Recents</Text>;
  _handleIndexChange = index => this.setState({ index });
 
  _renderScene = BottomNavigation.SceneMap({
-   music:()=> <Text>Aijz</Text>,
-   albums: ()=><Text>new</Text>,
-   recents: RecentsRoute,
+   music:()=> <Pending/>,
+   albums: ()=><ShortList/>,
+   recents: ()=><Selected/>,
  });
 
     render(){
         let { login,main,index } = this.state
        const routes = [
             { key: 'music', title: 'Pending', icon: props=><FontAwesomeIcon  color={index == 0 &&'white'} size={index == 0 ? 23:18} icon={faFlagCheckered} /> , color:'#ef5350'},
-            { key: 'albums', title: 'Short listed', icon: ()=><FontAwesomeIcon color={index == 1 &&'#296'} size={index == 1 ? 23:18} icon={faList} /> ,color:'yellow' },
+            { key: 'albums', title: 'Short listed', icon: ()=><FontAwesomeIcon color={index == 1 &&'#296'} size={index == 1 ? 23:18} icon={faList} /> ,color:'#ffab00' },
             { key: 'recents', title: 'Selected', icon: ()=><FontAwesomeIcon color={index == 2 &&'white'} size={index == 2 ? 23:18} icon={faCheck} />,color:'#296'},
           ]
         return(
@@ -98,6 +99,12 @@ const RecentsRoute = () => <Text>Recents</Text>;
     <Text style={{color:'white',fontSize:15,}}>React Native Developer</Text>
 </TouchableOpacity>
 
+
+<TouchableOpacity style={{alignSelf:'flex-start',paddingLeft:10,paddingRight:10,padding:4,marginBottom:10,elevation:10}}>
+    {index == 1 && <Text style={{color:'white',fontSize:15,}}>Short Listed Candidates</Text>}
+    {index == 0 && <Text style={{color:'white',fontSize:15,}}>Candidates</Text>}
+    {index == 2 && <Text style={{color:'white',fontSize:15,}}>Selected Candidates</Text>}
+</TouchableOpacity>
 </ImageBackground>
             <BottomNavigation
             activeColor={index == 2 ? "white" : (index == 1?"#295":"white")}
@@ -109,25 +116,6 @@ const RecentsRoute = () => <Text>Recents</Text>;
         renderScene={this._renderScene}
       />
             
-
-{/* <View style={styles.HeaderContainer}>
-<View>
-    <Text>Company name</Text>
-</View>
-</View> */}
-{/* <View style={styles.container}>
-
-
-
-
-       
-<TouchableOpacity  onPress={()=>this.props.navigation.navigate('AddCompany')} style={styles.addModal}>
-    <Text style={styles.addModalTxt}>+</Text>
-</TouchableOpacity>
-
-              
-
-</View> */}
 
             </View>
            

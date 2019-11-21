@@ -11,7 +11,7 @@ import { Add_User,Remove_User} from '../../store/actions/index'
 import AddCompany from './AddCompany'
 import { BottomNavigation, Text, } from 'react-native-paper';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faAddressBook, faHome, faMale, faClosedCaptioning, faDoorClosed,faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { faAddressBook, faHome, faMale, faClosedCaptioning, faDoorClosed,faArrowLeft,faSearch,faWindowClose } from '@fortawesome/free-solid-svg-icons'
 import img from './image'
 import Company from './CompanyD'
 import JObs from './Job'
@@ -32,7 +32,7 @@ const RecentsRoute = () => <Text>Recents</Text>;
         login:false,main:true,
         WIDTH:300,
         item:this.props.navigation.getParam('company'),
-        index: 0,
+        index: 0,search:false,
     // routes: [
     //   { key: 'music', title: 'Home', icon: props=><FontAwesomeIcon  color={'#296'} icon={faHome} /> , color:'#ef5350'},
     //   { key: 'albums', title: 'Active Jobs', icon: ()=><FontAwesomeIcon icon={faMale} /> ,color:'pink' },
@@ -74,15 +74,15 @@ const RecentsRoute = () => <Text>Recents</Text>;
 
  _renderScene = BottomNavigation.SceneMap({
    music:()=> <Company item={this.state.item}/>,
-   albums: ()=><JObs navigation={this.props.navigation} jobs={this.state.item ? this.state.item.Jobs :[]}/>,
+   albums: ()=><JObs navigation={this.props.navigation} jobs={this.state.item ? this.state.item.activeJobs :[]}/>,
    recents: RecentsRoute,
  });
 
     render(){
-        let { login,main,index } = this.state
+        let { login,main,index,search } = this.state
        const routes = [
             { key: 'music', title: 'Home', icon: props=><FontAwesomeIcon  color={index == 0 &&'#ef5350'} size={index == 0 ? 23:18} icon={faHome} /> , color:'white'},
-            { key: 'albums', title: 'Active Jobs', icon: ()=><FontAwesomeIcon color={index == 1 &&'#296'} size={index == 1 ? 23:18} icon={faMale} /> ,color:'skyblue' },
+            { key: 'albums', title: 'Active Jobs', icon: ()=><FontAwesomeIcon color={index == 1 &&'white'} size={index == 1 ? 23:18} icon={faMale} /> ,color:'#ffab00' },
             { key: 'recents', title: 'Closed Jobs', icon: ()=><FontAwesomeIcon color={index == 2 &&'white'} size={index == 2 ? 23:18} icon={faDoorClosed} />,color:'coral'},
           ]
         return(
@@ -90,17 +90,33 @@ const RecentsRoute = () => <Text>Recents</Text>;
                 <StatusBar backgroundColor="#eee" barStyle="dark-content" />
 <ImageBackground style={[styles.banner]} source={{uri:img}}>
 
-<TouchableOpacity style={{marginLeft:5,padding:5}}>
+<View style={{display:'flex',flexDirection:'row',justifyContent:'space-between'}}>
+
+<TouchableOpacity onPress={()=>this.props.navigation.goBack()} style={{marginLeft:5,padding:5,marginTop:4}}>
     <FontAwesomeIcon color='#ef5350' size={23} icon={faArrowLeft} />
 </TouchableOpacity>
 
+
+    {index != 0 && search && <TextInput autoFocus={true} placeholder="Search Jobs Here" style={{flex:0.9,backgroundColor:'#eee',color:"#ef5350",height:40,paddingLeft:20,marginTop:4}} />}
+
+{index != 0 && !search &&<TouchableOpacity onPress={()=>this.setState({search:true})} style={{marginLeft:5,padding:5,flexDirection:'row',justifyContent:'space-between',marginTop:4,marginRight:4}}>
+    <FontAwesomeIcon color='#ef5350' size={23} icon={faSearch} />
+</TouchableOpacity>
+}
+
+{ search && index != 0 && <TouchableOpacity onPress={()=>this.setState({search:false})} style={{marginLeft:5,padding:5,flexDirection:'row',justifyContent:'space-between',marginTop:4,marginRight:4}}>
+    <FontAwesomeIcon color='#ef5350' size={23} icon={faWindowClose} />
+</TouchableOpacity>}
+
+
+</View>
 <TouchableOpacity style={{alignSelf:'center',backgroundColor:'#ef5350',borderRadius:15,paddingLeft:10,paddingRight:10,padding:4,marginBottom:10,elevation:10}}>
     <Text style={{color:'white',fontSize:15,}}>The Future Technology solution</Text>
 </TouchableOpacity>
 
 </ImageBackground>
             <BottomNavigation
-            activeColor={index == 2 ? "white" : (index == 1?"#295":"#ef5350")}
+            activeColor={index == 2 ? "white" : (index == 1?"white":"#ef5350")}
             barStyle={{backgroundColor:'white'}}
             shifting={true}
             sceneAnimationEnabled={true}
