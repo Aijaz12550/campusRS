@@ -11,14 +11,14 @@ import { connect } from 'react-redux'
 import { Add_User,Remove_User} from '../../store/actions/index'
 import ip from '../ip'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faHeart, faBars, faSearch, faWindowClose, } from '@fortawesome/free-solid-svg-icons'
-
+import { faHeart, faBars, faSearch, faWindowClose,faArrowAltCircleDown, faSign,faCheckCircle, faArrowAltCircleUp, faFlag,faFlagCheckered } from '@fortawesome/free-solid-svg-icons'
+import moment from 'moment'
 
  class Home extends Component {
     state={
         login:false,main:true,
         WIDTH:300,refreshing:false, setRefreshing:false,heart:false,search:false,
-        resultArray:[],v:null,more:false,
+        resultArray:[],v:null,more:false,detailDekhao:false,
     }
     constructor(props){
         super(props);
@@ -36,6 +36,15 @@ import { faHeart, faBars, faSearch, faWindowClose, } from '@fortawesome/free-sol
 
  componentDidMount(){
     this._getAll()
+    var d = 2000
+
+    setInterval(()=>{
+        this.setState({dd:20})
+        d = 4000
+    },d)
+    setInterval(()=>{
+        this.setState({dd:15})
+    },4000)
  }
  async _getAll(){
     await fetch(`http://${ip}:3000/company/allcompanies`,{
@@ -63,6 +72,9 @@ import { faHeart, faBars, faSearch, faWindowClose, } from '@fortawesome/free-sol
 
 
   _search(v){
+      if(!v || v == 'All'){
+          this.setState({v:null})
+      }
       let { comps } = this.state;
       let flag = false;
      
@@ -70,15 +82,15 @@ import { faHeart, faBars, faSearch, faWindowClose, } from '@fortawesome/free-sol
 
         let res = comps.filter( a => (a.title).toLowerCase().indexOf(v.toLowerCase()) != -1)
 
-        if(res.length){
+        if(res.length && v != 'All'){
             flag = true
-            this.setState({resultArray:res,v})
-        }else if(v){
+            this.setState({resultArray:res,v:v?v:null})
+        }else if(v && v != 'All'){
             this.setState({v,})
         }else{
             this.setState({v:null})
         }
-        if(i == comps.length-1 && !flag){
+        if(i == comps.length-1 && !flag && v != 'All'){
             this.setState({resultArray:[]})
         }
 
@@ -87,7 +99,7 @@ import { faHeart, faBars, faSearch, faWindowClose, } from '@fortawesome/free-sol
 
 //_____________________________________________________action
 
-async _action(action,jobId){
+async _action(action,jobId,test){
     await fetch(`http://${ip}:3000/company/action`,{
         method:'POST',
         headers:{
@@ -96,6 +108,7 @@ async _action(action,jobId){
         },
         body:JSON.stringify({
             id:jobId,
+            test:test,
             action:{
                 _id:this.props.user._id,
             action:action
@@ -104,13 +117,66 @@ async _action(action,jobId){
 
     }).then( res => res.json())
     .then( data => {
+        this._getAll()
         console.log('Action Added')
     }).catch( e => {
         console.log('error~~~~~~~~',e)
     })
 }
+
+
+//_____________________________________________________action
+
+async _deleteAction(array,index,test,jobId){
+   array.splice(index, 1);
+    await fetch(`http://${ip}:3000/company/action`,{
+        method:'POST',
+        headers:{
+            "Content-Type":'application/json',
+            authorization:`Bearer ${this.props.user.token}`
+        },
+        body:JSON.stringify({
+            id:jobId,
+            test:test,
+            action:array
+        })
+
+    }).then( res => res.json())
+    .then( data => {
+        this._getAll()
+        console.log('Action Added')
+    }).catch( e => {
+        console.log('error~~~~~~~~',e)
+    })
+}
+
+// _____________________________________Apply for job
+  async _applyJob(jobId){
+      await fetch(`http://${ip}:3000/company/apply`,{
+          method:'POST',
+          headers:{
+              "Content-Type":'application/json',
+              authorization:`Bearer ${this.props.user.token}`
+          },
+          body:JSON.stringify({
+              job_id:jobId,
+              application:{
+                applicant_id:this.props.user._id,
+                status:"Pending",
+            }
+          })
+
+      }).then( res => res.json() )
+      .then( data => {
+          this._getAll()
+          console.log('~~data~~',data)
+      }).catch( e => {
+          console.log('~~error~~',e)
+      })
+  }
+
     render(){
-        let { login,main, companies,refreshing, setRefreshing,comps, heart, search,v,resultArray } = this.state
+        let { login,main, companies,refreshing, setRefreshing,comps, heart, search,v,resultArray, dd, detailDekhao } = this.state
         
         
 
@@ -149,7 +215,7 @@ async _action(action,jobId){
 {/* ======================================================================================CHIPS------------------ */}
 <FlatList
 
-data={[{name:'React Native',_id:'1',color:'#296'},{name:'React Js',_id:'2',color:'coral'},{name:'JavaScript',_id:'3'},
+data={[{name:'All',_id:'11',color:'navy'},{name:'React Native',_id:'1',color:'#296'},{name:'React Js',_id:'2',color:'coral'},{name:'JavaScript',_id:'3'},
 {name:'HTML',_id:'4',color:'gray'},{name:'CSS',_id:'5',color:'#296'},{name:'MERN Stack',_id:'6',color:'gray'},
 
 {name:'Node js',_id:'7',color:'#296'},{name:'MEAN Stack',_id:'8',color:'#296'},]}
@@ -176,7 +242,7 @@ keyExtractor={item => item._id}
                       } ></ScrollView>}
 
 <View style={styles.container}>
-    {!v &&
+    {(v)?null:
                       
                        <FlatList
                                refreshControl={
@@ -185,61 +251,159 @@ keyExtractor={item => item._id}
                                   onRefresh={this._onRefresh}
                                   />
                                 }
-/**
- * [{"__v": 0, "_id": "5dd53a7fb5275622f4e78ec0", "actions": [Array], "applications": [Array], "cId": "_id", "experience": "experience", 
- * "hired": [Array], "job_responsibility": "res", "job_type": "jobType", "positions": "positions", "required_qualification": "qualification", 
- * "salary": "salary", "skills": "skills", "timestamp": "String", "title": "title"}, {"__v": 0, "_id": "5dd53d5de1604709b08cd3f9", 
- * "actions": [Array], "applications": [Array], "cId": "5dd527fc5644ec224cbd2781", "experience": "2", "hired": [Array], "job_responsibility":
- *  "Response
-Hg", "job_type": "Remote", "positions": "5", "required_qualification": "Graduation", "salary": "2000000", "skills": "Redux", 
-"timestamp": "1574255960479", "title": "React Native Developer"}
- */
+
         data={comps}
-renderItem={({ item }) => <TouchableOpacity style={[styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} onPress={()=>this.props.navigation.dispatch(DrawerActions.openDrawer())}>
+renderItem={({ item }) => <TouchableOpacity style={[styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} >
 <View style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:10}}>
 <Text style={{fontSize:16,fontWeight:'bold',color:"#ef5350",}} >{item.title}</Text>
 </View>
 
 <View style={{borderBottomColor:"#eee",borderBottomWidth:1,paddingBottom:5}}> 
 <View>
- <Text>Posted : {item.timestamp}</Text>
+ <Text> Posted : {moment(JSON.parse(item.timestamp)).fromNow()}</Text>
 <Text> Required Qualification : {item.required_qualification}</Text>
 <Text> Required Experience : {item.experience}</Text>
-<Text>Salary : {item.salary}</Text>
+<Text> Salary : {item.salary}</Text>
+
+{detailDekhao == item._id &&
+<View>
 <Text>Posted : {item.timestamp}</Text>
 <Text> Required Qualification : {item.required_qualification}</Text>
 <Text> Required Experience : {item.experience}</Text>
 <Text>Salary : {item.salary}</Text>
+</View>
+}
+
+
 </View>
 
 
 </View>
 <View style={{display:'flex',flexDirection:'row',justifyContent:'space-between',alignItems:'space-between',marginTop:10}}>
 
-<TouchableOpacity >
-<Text style={{fontSize:16,fontWeight:'bold',color:"green"}}>Apply</Text>
-</TouchableOpacity>
 
+{/* ________________________________________________________________________________________________________apply */}
 {/* _____________________________________________________like */}
-<FlatList
-data={item.actions}
-renderItem={({item})=>}
-/>
-    {heart == item._id
-     ?
-<TouchableOpacity >
-    <FontAwesomeIcon onPress={()=>this._action(false,item._id)} size={20} color="red" icon={faHeart} />
-</TouchableOpacity>
+{item.applications.length
+?
+<View>
+{
+
+item.applications.map((val,key)=>{
+    
+    let flag = false
+    if(  val.applicant_id === this.props.user._id ){
+        flag = true;
+        return(
+            <TouchableOpacity  style={{display:'flex',flexDirection:'row',justifyContent:'center'}}>
+            <View style={{alignSelf:'center'}}>
+            <FontAwesomeIcon   color="#296" icon={faCheckCircle} />
+            <Text style={{fontSize:8,color:"#296"}}>Applied</Text>
+                </View>
+        <Text style={{marginLeft:5}} >{item.applications.length}</Text>
+            </TouchableOpacity>
+        )
+    }
+   else if(key === item.applications.length - 1 && !flag) {
+        return(
+            <TouchableOpacity style={{display:'flex',flexDirection:'row',justifyContent:'center'}} onPress={()=>this._applyJob(item._id)} >
+          <View>
+            <FontAwesomeIcon   icon={faCheckCircle} />
+            <Text style={{fontSize:8,color:"black"}}> Apply</Text>
+                </View>
+        <Text style={{marginLeft:5}} >{item.applications.length}</Text>
+            </TouchableOpacity>
+        )
+    }
+    
+})
+    
+
+}
+</View>
+
 :
-<TouchableOpacity onPress={()=>this._action(true,item._id)}  >
-<FontAwesomeIcon  icon={faHeart} />
+
+<TouchableOpacity onPress={()=>this._applyJob(item._id)} >
+{/* <Text style={{fontSize:16,fontWeight:'bold',color:"green"}}>Apply</Text> */}
+<FontAwesomeIcon  size={20} icon={faCheckCircle} />
 </TouchableOpacity>
 }
-// _______________________________________________________________end
+{/* ____________________________________________________________apply end */}
 
-<TouchableOpacity  >
-<Text  style={{fontSize:16,fontWeight:'bold',color:"navy"}}> more</Text>
+{/* _____________________________________________________like */}
+{item.actions.length
+?
+<View>
+{
+
+item.actions.map((val,key)=>{
+    // let array = ["item.actions","ewewe","item.actions","ewewe"]
+    // let test = array.splice(2,1)
+    // console.log("~~~~~~ss________",array,"~~~~",key)
+    let flag = false
+    if(  val._id === this.props.user._id ){
+        flag = true;
+        return(
+            <TouchableOpacity style={{display:'flex',flexDirection:'row'}} key={key} onPress={()=>this._deleteAction(item.actions,key,true,item._id)} >
+                <View>
+            <FontAwesomeIcon  size={dd} color="red" icon={faHeart} />
+            <Text style={{fontSize:8,color:"red"}}> liked</Text>
+                </View>
+        <Text style={{marginLeft:5}} >{item.actions.length}</Text>
+        </TouchableOpacity>
+        )
+    }
+   else if(key === item.actions.length - 1 && !flag) {
+        return(
+            <TouchableOpacity style={{display:'flex',flexDirection:'row'}} key={key} onPress={()=>this._action(true,item._id,false,key)} >
+                <View>
+            <FontAwesomeIcon   icon={faHeart} />
+            <Text style={{fontSize:8,color:"black"}}> like</Text>
+                </View>
+        <Text style={{marginLeft:5}} >{item.actions.length}</Text>
+        </TouchableOpacity>
+        )
+    }
+    
+})
+    
+
+}
+</View>
+
+:
+
+<TouchableOpacity onPress={()=>this._action(true,item._id,false)}  >
+    <FontAwesomeIcon  icon={faHeart} />
 </TouchableOpacity>
+}
+
+
+{/* _______________________flag */}
+
+<TouchableOpacity onPress={()=>this._applyJob(item._id)} >
+<FontAwesomeIcon color="#296" size={20} icon={faFlagCheckered} />
+<Text style={{fontSize:8,color:"green"}}>marked</Text>
+</TouchableOpacity>
+{/* ---------------------------end */}
+
+
+
+{/* // _______________________________________________________________end */}
+{!detailDekhao?
+<TouchableOpacity onPress={()=>this.setState({detailDekhao:item._id})}  >
+<FontAwesomeIcon  size={20} color='navy' icon={faArrowAltCircleDown} />
+<Text  style={{fontSize:10,color:"navy"}}> more</Text>
+</TouchableOpacity>
+:
+
+
+<TouchableOpacity onPress={()=>this.setState({detailDekhao:false})}  >
+<FontAwesomeIcon  size={20} color='navy' icon={faArrowAltCircleUp} />
+<Text  style={{fontSize:10,color:"navy"}}> less</Text>
+</TouchableOpacity>
+}
 
 </View>
 
@@ -248,12 +412,7 @@ renderItem={({item})=>}
 keyExtractor={item => item._id}
 />
 
-   
-   
-   
-// }
-// keyExtractor={item => item._id}
-// />
+  
 }
 
 
