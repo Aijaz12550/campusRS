@@ -16,6 +16,7 @@ import img from './image'
 import Pending from './jobs/pending'
 import ShortList from './jobs/shortlisted'
 import Selected from './jobs/selected'
+import ip from '../ip'
 
 
 const MusicRoute = () => <Text style={[ { backgroundColor: '#673ab7',flex:1 }]}>Music</Text>;
@@ -33,7 +34,7 @@ const RecentsRoute = () => <Text>Recents</Text>;
         login:false,main:true,
         WIDTH:300,
         item:this.props.navigation.getParam('company'),
-        index: 0,
+        index: 0,result:[],
     // routes: [
     //   { key: 'music', title: 'Home', icon: props=><FontAwesomeIcon  color={'#296'} icon={faHome} /> , color:'#ef5350'},
     //   { key: 'albums', title: 'Active Jobs', icon: ()=><FontAwesomeIcon icon={faMale} /> ,color:'pink' },
@@ -56,8 +57,44 @@ const RecentsRoute = () => <Text>Recents</Text>;
       };
 
  componentDidMount(){
-     console.log('~~props~~',this.props)
+     console.log('~~param~~>>>>',this.props.navigation.getParam('job'))
+     let {applications,_id} = this.props.navigation.getParam('job')
+     this.setState({
+         jobid:_id
+     })
+     let idArray = [];
+
+     if(applications){
+         applications.map(v =>{
+             idArray.push(v.applicant_id)
+             this.setState({idArray})
+         })
+     } 
+     setTimeout(()=>{
+        //  this._getApplicants()
+     },4000)
+
  }
+
+//  __________________________get applicants
+//  async _getApplicants(){
+//      fetch(`http://${ip}:3000/company/applicants`,{
+//          method:'POST',
+//          headers:{
+//              "Content-Type":"application/json",
+//              authorization:`Bearer ${this.props.user.token}`
+//          },
+//          body:JSON.stringify({array:this.state.idArray})
+//      }).then( res => res.json())
+//      .then( data => {
+//          if(data.result){
+//              this.setState({result:data.result})
+//          }
+//          console.log('---job Applicant',data)
+//      }).catch( error => {
+
+//      })
+//  }
 /**
  * {"result": [{"Jobs": [Array], "__v": 0, "_id": "5dd1a4f9dfe16e15301c3aba", "closeJobs": [Array], 
  * "companyName": "Future", "description": "We are working on following technology from 10 years..",
@@ -74,9 +111,9 @@ const RecentsRoute = () => <Text>Recents</Text>;
  _handleIndexChange = index => this.setState({ index });
 
  _renderScene = BottomNavigation.SceneMap({
-   music:()=> <Pending/>,
-   albums: ()=><ShortList/>,
-   recents: ()=><Selected/>,
+   music:()=> <Pending id={this.props.navigation.getParam('job')._id} />,
+   albums: ()=><ShortList id={this.props.navigation.getParam('job')._id} />,
+   recents: ()=><Selected id={this.props.navigation.getParam('job')._id} />,
  });
 
     render(){
@@ -91,7 +128,7 @@ const RecentsRoute = () => <Text>Recents</Text>;
                 <StatusBar backgroundColor="#ef5350" barStyle="light-content" />
 <ImageBackground style={[styles.banner]} >
 
-<TouchableOpacity style={{marginLeft:5,padding:5}}>
+<TouchableOpacity style={{marginLeft:5,padding:5}} onPress={()=>this.props.navigation.goBack()}>
     <FontAwesomeIcon color='white' size={23} icon={faArrowLeft} />
 </TouchableOpacity>
 
@@ -196,7 +233,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state =>{
     return{
-        user : state.user
+        user : state.AuthReducer.user
     }
 }
 

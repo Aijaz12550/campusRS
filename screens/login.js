@@ -130,10 +130,11 @@ btnText:{
     color:'#ef5350'
 },
 })
-
+//  {"AuthReducer": {}, "CvReducer": {"cv": undefined}, "_persist": {"rehydrated": true, "version": -1}}
 const mapStateToProps = state =>{
+    console.log('---------------login',state)
     return{
-        user : state.user
+        user : state.AuthReducer.user
     }
 }
 

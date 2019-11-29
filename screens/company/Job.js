@@ -65,16 +65,16 @@ import img from './image'
         data={this.props.jobs}
         renderItem={({ item }) => <TouchableOpacity style={[styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} onPress={()=>this.props.navigation.dispatch(DrawerActions.openDrawer())}>
         <View style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:10}}>
-            <Text style={{fontSize:16,fontWeight:'bold',color:"white"}}>{item.title}</Text>
+            <Text style={{fontSize:16,fontWeight:'bold',color:"#ef5350"}}>{item.title}</Text>
         </View>
 
-        <View style={{borderBottomColor:"#eee",borderBottomWidth:1,paddingBottom:5}}> 
-            <Text style={{fontSize:16,fontWeight:'bold',color:'white'}}>Detail :</Text>
+        <View style={{borderBottomColor:"#ef5350",borderBottomWidth:1,paddingBottom:5}}> 
+            <Text style={{fontSize:16,fontWeight:'bold',color:'black'}}>Detail :</Text>
             <View>
-                    <Text style={{color:'white'}}>Added  : {item.timestamp}</Text>
-            <Text style={{color:'white'}}>Total Applicants : {item.applications.length}</Text>
-                    <Text style={{color:'white'}}>Total Hired : {item.hired.length}</Text>
-                    <Text style={{color:'white'}} numberOfLines={3}>Job Responsibility : {item.job_responsibility}</Text>
+                    <Text style={{color:'black'}}>Added  : {item.timestamp}</Text>
+            <Text style={{color:'black'}}>Total Applicants : {item.applications.length}</Text>
+                    <Text style={{color:'black'}}>Total Hired : {item.hired.length}</Text>
+                    <Text style={{color:'black'}} numberOfLines={3}>Job Responsibility : {item.job_responsibility}</Text>
             
         </View>
 
@@ -83,7 +83,7 @@ import img from './image'
         <View style={{display:'flex',flexDirection:'row',justifyContent:'space-between',alignItems:'space-between',marginTop:10}}>
             
             <TouchableOpacity onPress={()=>this.props.navigation.navigate('PostJob',{owner:item._id})}>
-            <Text style={{fontSize:16,fontWeight:'bold',color:"yellow"}}>Close</Text>
+            <Text style={{fontSize:16,fontWeight:'bold',color:"#ef5350"}}>Close</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={()=>this.props.navigation.navigate("JobDetail",{job:item})} >
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
 
     },
     card:{
-        backgroundColor:'#ef5350',
+        backgroundColor:'#eee',
         margin:10,
         padding:10,
         borderRadius:5,
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state =>{
     return{
-        user : state.user
+        user : state.AuthReducer.user
     }
 }
 

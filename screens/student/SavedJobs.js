@@ -13,13 +13,12 @@ import ip from '../ip'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faHeart, faBars, faSearch, faWindowClose,faArrowAltCircleDown, faSign,faCheckCircle, faArrowAltCircleUp, faFlag,faFlagCheckered } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
-import Add_Cv from '../../store/actions/CvAction';
 
  class Home extends Component {
     state={
         login:false,main:true,
         WIDTH:300,refreshing:false, setRefreshing:false,heart:false,search:false,
-        resultArray:[],v:null,more:false,detailDekhao:false,
+        resultArray:[],v:null,more:false,detailDekhao:false,comps:null
     }
     constructor(props){
         super(props);
@@ -36,38 +35,17 @@ import Add_Cv from '../../store/actions/CvAction';
  };
 
  componentDidMount(){
-
-    console.log('`````````Home--this.props.cv',this.props.cv)
     this._getAll()
-    var d = 1000
+    var d = 2000
 
     setInterval(()=>{
-        this.setState({dd:18})
-        d = 2000
+        this.setState({dd:20})
+        d = 4000
     },d)
     setInterval(()=>{
         this.setState({dd:15})
-    },2000)
-
-    this._mycv()
+    },4000)
  }
-
- async _mycv(){
-     await fetch(`http://${ip}:3000/users/mycv`,{
-         method:'GET',
-         headers:{
-             "Content-Type":'application/json',
-             authorization:`Bearer ${this.props.user.token}`,
-             id:this.props.user._id
-         }
-     }).then( res => res.json()).then( data => {
-         console.log('ff',data)
-         this.props.add_cv(data.result)
-     }).catch( e => {
-         console.log('eee',e)
-     })
- }
-
  async _getAll(){
     await fetch(`http://${ip}:3000/company/alljobs`,{
         method:"GET",
@@ -78,8 +56,8 @@ import Add_Cv from '../../store/actions/CvAction';
     })
     .then(res=>res.json())
     .then(data=>{
-        this.setState({comps:data.result})
         this.setState({refreshing:false})
+        this.setState({comps:data.result})
         console.log("~~comp~~",data)
       })
     .catch(e=>{
@@ -98,7 +76,7 @@ import Add_Cv from '../../store/actions/CvAction';
 
   _search(v){
       if(!v || v == 'All'){
-          this.setState({v:null})
+          this.setState({v:null,resultArray:[]})
       }
       let { comps } = this.state;
       let flag = false;
@@ -124,7 +102,10 @@ import Add_Cv from '../../store/actions/CvAction';
 
 //_____________________________________________________action
 
-async _newAction(action,jobId,test){
+
+//_____________________________________________________action
+
+async _newAction(action,jobId){
     await fetch(`http://${ip}:3000/company/newAction`,{
         method:'POST',
         headers:{
@@ -145,6 +126,8 @@ async _newAction(action,jobId,test){
         console.log('error~~~~~~~~',e)
     })
 }
+
+
 
 
 //_____________________________________________________action
@@ -168,12 +151,8 @@ async _deleteAction(action_id){
     })
 }
 
-// -------------------------------------------------------------------------------
-
-
-
 // _____________________________________Apply for job
-  async _updateJob(aId,jobId){
+  async _applyJob(jobId){
       await fetch(`http://${ip}:3000/company/apply`,{
           method:'POST',
           headers:{
@@ -182,7 +161,10 @@ async _deleteAction(action_id){
           },
           body:JSON.stringify({
               job_id:jobId,
-              application_id:aId
+              application:{
+                applicant_id:this.props.user._id,
+                status:"Pending",
+            }
           })
 
       }).then( res => res.json() )
@@ -194,41 +176,11 @@ async _deleteAction(action_id){
       })
   }
 
-
-//   -------apply for job---
- async _applyJob(cId,jobId){
-     if(this.props.cv){
-
-         console.log('chhh',jobId)
-         await fetch(`http://${ip}:3000/company/application`,{
-             method:'POST',
-         headers:{
-             "Content-Type":'application/json',
-             authorization:`Bearer ${this.props.user.token}`
-         },
-         body:JSON.stringify({
-            applicant_id:this.props.user._id,
-            company_id :cId,
-            job_id:jobId,
-            status:"Pending",
-         })
-     }).then( res => res.json()).then( aijaz => {
-         console.log('---aijaz',aijaz)
-         if(aijaz.result){
-             this._updateJob(aijaz.result._id,jobId)
-         }
-     }).catch( e => {
-         console.log('__error',e)
-        })
-    }else{
-        this.props.navigation.navigate('CV')
-    }
- }
-
     render(){
         let { login,main, companies,refreshing, setRefreshing,comps, heart, search,v,resultArray, dd, detailDekhao } = this.state
-        // console.log('jjjjjjjjjjjjjj',this.props.cv)
-        
+        var ff = false;
+        let toShow = resultArray.length ? resultArray:(!v?comps:[]);
+        var flag1 = false
 
 
   function Item({ title }) {
@@ -249,7 +201,7 @@ async _deleteAction(action_id){
 </TouchableOpacity>
 
 
-{ !search && <Text style={styles.title} >Jobs Feed</Text>}
+{ !search && <Text style={styles.title} >Saved Jobs</Text>}
 { !search && <TouchableOpacity onPress={()=>this.setState({search:true})} >
     <FontAwesomeIcon size={22} color="white" icon={faSearch} />
 </TouchableOpacity>}
@@ -284,84 +236,98 @@ keyExtractor={item => item._id}
 {/* ==============================chips end----------------- */}
 
 
-{ !comps && <ScrollView style={{flex:1,backgroundColor:'lightgray'}}  refreshControl={
+{ <ScrollView style={{flex:1,backgroundColor:'lightgray'}}  refreshControl={
                         <RefreshControl
                           refreshing={this.state.refreshing}
                           onRefresh={this._onRefresh}
                         />
-                      } ></ScrollView>}
+                      } >
 
 <View style={styles.container}>
-    {(v)?null:
-                      
-                       <FlatList
-                               refreshControl={
-                                   <RefreshControl
-                                  refreshing={this.state.refreshing}
-                                  onRefresh={this._onRefresh}
-                                  />
-                                }
-
-        data={comps}
-renderItem={({ item }) => <TouchableOpacity style={[styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} >
-<View style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:10}}>
-<Text style={{fontSize:16,fontWeight:'bold',color:"#ef5350",}} >{item.title}</Text>
-</View>
-
-<View style={{borderBottomColor:"#eee",borderBottomWidth:1,paddingBottom:5}}> 
-<View>
- <Text> Posted : {moment(JSON.parse(item.timestamp)).fromNow()}</Text>
-<Text> Required Qualification : {item.required_qualification}</Text>
-<Text> Required Experience : {item.experience}</Text>
-
-{detailDekhao == item._id &&
-<View>
-<Text> Job Type : {item.job_type}</Text>
-<Text> Vacancies : {item.positions}</Text>
-<Text> Skills : {item.skills}</Text>
-<Text> Salary : {item.salary}</Text>
-</View>
-}
+    
 
 
-</View>
+    {/* ["__v": 0, "_id": "5ddd39835e7cb6237872ea52", "actions": [Array], "applications": [Array], "cId": "5ddd28dafdeb190efc16ddbd", 
+    "experience": "12", "hired": [Array], "job_responsibility": "Test", "job_type": "Test", "positions": "Test", 
+    "required_qualification": "Test", "salary": "Tsey", "skills": "Test", "timestamp": "1574779267857", "title": "Test",
+    ] */}
+
+{comps && toShow.map((v,k)=>{
+   
+    return(
+        <View>{
+    v.actions.length ? v.actions.map((nes,nesk)=>{
+        // console.log("nes..",nes.user_id == this.props.user._id)
+        if(nes.user_id == this.props.user._id){
+            ff = true;
+            return(<View style={[styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]}>
+
+            <TouchableOpacity  >
+            <View style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:10}}>
+            <Text style={{fontSize:16,fontWeight:'bold',color:"#ef5350",}} >{v.title}</Text>
+            </View>
+            
+            <View style={{borderBottomColor:"#eee",borderBottomWidth:1,paddingBottom:5}}> 
+            <View>
+             <Text> Posted : {moment(JSON.parse(v.timestamp)).fromNow()}</Text>
+            <Text> Required Qualification : {v.required_qualification}</Text>
+            <Text> Required Experience : {v.experience}</Text>
+            
+            {detailDekhao == v._id &&
+            <View>
+            <Text> Job Type : {v.job_type}</Text>
+            <Text> Vacancies : {v.positions}</Text>
+            <Text> Skills : {v.skills}</Text>
+            <Text> Salary : {v.salary}</Text>
+            </View>
+            }
+            
+            
+            </View>
+            
+            
+            </View>
+
+            </TouchableOpacity>
+
+            {/* Footer--------------- */}
+
+            <View  style={{flexDirection:'row',justifyContent:'space-around',alignItems:'center',marginTop:5}}>
+
+            {/* _____________________________________________________like */}
 
 
-</View>
-<View style={{display:'flex',flexDirection:'row',justifyContent:'space-between',alignItems:'space-between',marginTop:10}}>
 
-
-{/* ________________________________________________________________________________________________________apply */}
-{/* _____________________________________________________like */}
-{item.applications.length
+{/* ======================================================================================================== */}
+{v.applications.length
 ?
 <View>
 {
 
-item.applications.map((val,key)=>{
+v.applications.map((val,key)=>{
     
-    let flag = false
+    
     if(  val.applicant_id === this.props.user._id ){
-        flag = true;
+        flag1 = true;
         return(
-            <TouchableOpacity   style={{display:'flex',flexDirection:'row',justifyContent:'center'}}>
+            <TouchableOpacity  style={{display:'flex',flexDirection:'row',justifyContent:'center'}}>
             <View style={{alignSelf:'center'}}>
             <FontAwesomeIcon   color="#296" icon={faCheckCircle} />
             <Text style={{fontSize:8,color:"#296"}}>Applied</Text>
                 </View>
-        <Text style={{marginLeft:5}} >{item.applications.length}</Text>
+        <Text style={{marginLeft:5}} >{v.applications.length}</Text>
             </TouchableOpacity>
         )
     }
-   else if(key === item.applications.length - 1 && !flag) {
-    //    console.log('11111111111111',item._id)
+   else if(key === v.applications.length - 1 && !flag1) {
+    //    console.log('11111111111111',v.applicant_id)
         return(
-            <TouchableOpacity style={{display:'flex',flexDirection:'row',justifyContent:'center'}} onPress={()=>this._applyJob(item.cId,item._id)} >
+            <TouchableOpacity style={{display:'flex',flexDirection:'row',justifyContent:'center'}} onPress={()=>this._applyJob(v.cId,v._id)} >
           <View>
             <FontAwesomeIcon   icon={faCheckCircle} />
             <Text style={{fontSize:8,color:"black"}}> Apply</Text>
                 </View>
-        <Text style={{marginLeft:5}} >{item.applications.length}</Text>
+        <Text style={{marginLeft:5}} >{v.applications.length}</Text>
             </TouchableOpacity>
         )
     }
@@ -381,14 +347,22 @@ item.applications.map((val,key)=>{
 }
 {/* ____________________________________________________________apply end */}
 
-{/* _____________________________________________________like */}
-{item.actions.length
+
+
+
+
+
+
+
+
+
+{v.actions.length
 ?
 <View>
 {
-
-item.actions.map((val,key)=>{
-    // let array = ["item.actions","ewewe","item.actions","ewewe"]
+    
+    v.actions.map((val,key)=>{
+        // let array = ["v.actions","ewewe","v.actions","ewewe"]
     // let test = array.splice(2,1)
     // console.log("~~~~~~ss________",array,"~~~~",key)
     let flag = false
@@ -400,128 +374,79 @@ item.actions.map((val,key)=>{
             <FontAwesomeIcon  size={dd} color="red" icon={faHeart} />
             <Text style={{fontSize:8,color:"red"}}> liked</Text>
                 </View>
-        <Text style={{marginLeft:5}} >{item.actions.length}</Text>
+        <Text style={{marginLeft:5}} >{v.actions.length}</Text>
         </TouchableOpacity>
         )
     }
-   else if(key === item.actions.length - 1 && !flag) {
+    else if(key === v.actions.length - 1 && !flag) {
         return(
-            <TouchableOpacity style={{display:'flex',flexDirection:'row'}} key={key} onPress={()=>this._newAction(true,item._id,false,key)} >
+            <TouchableOpacity style={{display:'flex',flexDirection:'row'}} key={key} onPress={()=>this._newAction(true,v._id)} >
                 <View>
             <FontAwesomeIcon   icon={faHeart} />
             <Text style={{fontSize:8,color:"black"}}> like</Text>
                 </View>
-        <Text style={{marginLeft:5}} >{item.actions.length}</Text>
+        <Text style={{marginLeft:5}} >{v.actions.length}</Text>
         </TouchableOpacity>
         )
     }
     
 })
-    
+
 
 }
 </View>
 
 :
 
-<TouchableOpacity onPress={()=>this._newAction(true,item._id,false)}  >
+<TouchableOpacity onPress={()=>this._newAction(true,v._id)}  >
     <FontAwesomeIcon  icon={faHeart} />
 </TouchableOpacity>
 }
 
-
-{/* _______________________flag */}
-
-<TouchableOpacity onPress={()=>this._applyJob(item._id)} >
-<FontAwesomeIcon color="#296" size={16} icon={faFlagCheckered} />
-<Text style={{fontSize:8,color:"green"}}>marked</Text>
-</TouchableOpacity>
-{/* ---------------------------end */}
-
-
-
-{/* // _______________________________________________________________end */}
 {!detailDekhao?
-<TouchableOpacity onPress={()=>this.setState({detailDekhao:item._id})}  >
-<FontAwesomeIcon  size={18} color='navy' icon={faArrowAltCircleDown} />
+<TouchableOpacity onPress={()=>this.setState({detailDekhao:v._id})}  >
+<FontAwesomeIcon  size={20} color='navy' icon={faArrowAltCircleDown} />
 <Text  style={{fontSize:10,color:"navy"}}>more</Text>
 </TouchableOpacity>
 :
-
 
 <TouchableOpacity onPress={()=>this.setState({detailDekhao:false})}  >
 <FontAwesomeIcon  size={20} color='navy' icon={faArrowAltCircleUp} />
 <Text  style={{fontSize:10,color:"navy"}}> less</Text>
 </TouchableOpacity>
 }
-
-</View>
-
-</TouchableOpacity>
-}
-keyExtractor={item => item._id}
-/>
-
-  
-}
+           </View>
 
 
-                  {v && <FlatList
-                  ListEmptyComponent={()=><Text>No Job Found for {v}</Text>}
-data={resultArray}
-renderItem={({ item }) => <TouchableOpacity style={[styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} onPress={()=>this.props.navigation.dispatch(DrawerActions.openDrawer())}>
-<View style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:10}}>
-<Text style={{fontSize:16,fontWeight:'bold',color:"#ef5350",}} >{item.title}</Text>
-</View>
-
-<View style={{borderBottomColor:"#eee",borderBottomWidth:1,paddingBottom:5}}> 
-<View>
-<Text>Posted : {item.timestamp}</Text>
-<Text> Required Qualification : {item.required_qualification}</Text>
-<Text> Required Experience : {item.experience}</Text>
-<Text>Salary : {item.salary}</Text>
-</View>
-
-
-</View>
-<View style={{display:'flex',flexDirection:'row',justifyContent:'space-between',alignItems:'space-between',marginTop:10}}>
-
-<TouchableOpacity >
-<Text style={{fontSize:16,fontWeight:'bold',color:"green"}}>Apply</Text>
-</TouchableOpacity>
-
-{heart === item._id
-?
-<TouchableOpacity >
-<FontAwesomeIcon color="red" icon={faHeart} />
-</TouchableOpacity>
-:
-<TouchableOpacity onPress={()=>this.setState({heart:item._id})}>
-<FontAwesomeIcon icon={faHeart} />
-</TouchableOpacity>
-}
-
-<TouchableOpacity  >
-<Text style={{fontSize:16,fontWeight:'bold',color:"navy"}}> more</Text>
-</TouchableOpacity>
-
-</View>
-
-
-</TouchableOpacity>
-}
-keyExtractor={item => item._id}
-/>
-
-}
- 
-
-</View>
 
             </View>
-           
-        )
-    }
+           )
+        }else if( k === comps.length - 1  && !ff ){
+            return (
+                <View style={{flex:0.5}}>
+                <Text>No Saved Job</Text>
+            </View>
+                )
+            }
+            
+        })
+        :<View></View>
+    }</View>
+    )
+    
+})
+
+}
+
+
+</View>
+
+</ScrollView>}
+
+</View>
+
+)
+}
 }
 
 const styles = StyleSheet.create({
@@ -625,15 +550,13 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state =>{
     return{
-        user : state.AuthReducer.user,
-        cv : state.CvReducer.cv
+        user : state.AuthReducer.user
     }
 }
 
 const mapDispatchToProps = dispatch =>{
     return{
-        add_user : (user)=>dispatch(Add_User(user)),
-        add_cv:(cv)=>dispatch(Add_Cv(cv))
+        add_user : (user)=>dispatch(Add_User(user))
     }
 }
 export default connect(mapStateToProps,mapDispatchToProps)(Home)

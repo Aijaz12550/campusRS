@@ -7,7 +7,8 @@ import Modal from 'react-native-modal'
 import { DrawerActions } from 'react-navigation-drawer';
 import { connect } from 'react-redux'
 // import { Add_User,Remove_User} from '../store/actions/index'
-import { Add_User,Remove_User} from '../../store/actions/index'
+import { Add_User,Remove_User, } from '../../store/actions/index'
+import Add_Cv from '../../store/actions/CvAction'
 import { Picker, Icon } from 'native-base'
 import ip from '../ip'
 
@@ -22,7 +23,7 @@ import ip from '../ip'
         educationalDetail:false,
         desL:0,
         pd:false,
-
+        name:'',
         year:null,month:null,day:null,
 
         degree:null,
@@ -71,7 +72,18 @@ import ip from '../ip'
  };
 
  componentDidMount(){
-     console.log('~~props~~',this.props)
+     if(this.props.cv){
+
+         let { name, skills, year, degree, des, experience,  } = this.props.cv
+         this.setState({
+             name,
+             skills,
+             year,
+             degree,
+             des,
+             experience
+         })
+        }
  }
 
  onValueChange(value) {
@@ -90,7 +102,7 @@ import ip from '../ip'
         }
          this.setState({name:v,nameError:null})
      }else{
-         this.setState({nameError:'Name must be three charecters long'})
+         this.setState({nameError:'Name must be three charecters long',name:v})
      }
  }
 
@@ -108,7 +120,7 @@ _des(v){
             this.setState({pd:true})
         }
     }else{
-        this.setState({desError:'At least 10 characters..'})
+        this.setState({desError:'At least 10 characters..',des:v})
     }
 }
 
@@ -153,8 +165,8 @@ _more(){
             authorization:`Bearer ${this.props.user.token}`
         },
         body:JSON.stringify({
-            id:this.props.user._id,
             cv:{
+                _id:this.props.user._id,
                 name,
                 des,
                 degree,
@@ -166,7 +178,10 @@ _more(){
 
     })
     .then( res => res.json() )
-    .then( result => console.log('~~~//',result))
+    .then( result => {
+        this.props.add_cv(result.result)
+        console.log('~~~//',result)})
+        this.props.navigation.navigate('Home')
     .catch( e => console.log('~~error~~~',e))
 }
 // ---------------------end
@@ -179,7 +194,11 @@ _more(){
         experience[index] = {duration, designation, organization}
         this.setState({experience,personalDetail:false,educationalDetail:false})
         setTimeout(()=>{
-            this._addcv()
+            if(this.props.cv){
+                this._updatecv()
+            }else{
+                this._addcv()
+            }
         },2000)
     }else{
         this._addcv()
@@ -187,11 +206,53 @@ _more(){
     }
  }
 
+
+//
+// ---------------------------------------------update CV
+ async _updatecv(){
+    let {
+        name,
+        des,
+        degree,
+        year,month,day,
+        skills,
+        experience
+    } = this.state
+   await fetch(`http://${ip}:3000/users/updatecv`,{
+       method:'POST',
+       headers:{
+           "Content-Type" : 'application/json',
+           authorization:`Bearer ${this.props.user.token}`
+       },
+       body:JSON.stringify({
+           cv:{
+               _id:this.props.user._id,
+               name,
+               des,
+               degree,
+               year,
+               skills,
+               experience,
+           }
+       })
+
+   })
+   .then( res => res.json() )
+   .then( result => {
+       console.log('~~~//',result)
+       this.props.navigation.navigate('Home')
+    })
+   .catch( e => console.log('~~error~~~',e))
+}
+// ---------------------end
+
     render(){
         let { login,main,
             personalDetail,
             educationalDetail,
             desL,
+            name,
+            des,
             nameError,
             desError,
             pd,
@@ -203,7 +264,12 @@ _more(){
         
         } = this.state
 
-        
+          /**
+         * {"__v": 0, "_id": "5dd4134a15baa6343c26fb4b", "degree": "Bachelor", "des": "Gdhdhdhdddhdj", 
+         * "experience": [{"_id": "5dde8d292a3d8f2c1ce4b5f6", "designation": "Hdhdh", "duration": "Hxhx", 
+         * "organization": "Gdhf"}], "name": "Agsg", "skills": "Gxhddu
+", "year": "2019"}
+         */
         return(
             <View style={{flex:1}}>
 <StatusBar backgroundColor="#ef5350" barStyle="light-content" />
@@ -218,10 +284,10 @@ _more(){
                        <Text style={{fontSize:16,color:"#ef5350",fontWeight:'bold'}}>Personal Detail</Text>
                    </View>
                    <View style={{borderBottomColor:"#eee",borderBottomWidth:1,paddingBottom:5}}> 
-                       <TextInput onChangeText={(v)=>this._name(v)} placeholder="Enter Full Name" style={styles.input}/>
+                       <TextInput onChangeText={(v)=>this._name(v)} placeholder="Enter Full Name" value={name} style={styles.input}/>
                        {nameError && <Text style={{fontSize:11,color:'red'}} >{nameError}</Text>}
 
-                       <TextInput onChangeText={v=>this._des(v)} placeholder="Describe Your Self.." multiline={true} maxLength={300} style={[styles.input,{maxHeight:100}]}/>
+                       <TextInput onChangeText={v=>this._des(v)} placeholder="Describe Your Self.." value={des} multiline={true} maxLength={300} style={[styles.input,{maxHeight:100}]}/>
                        {desError && <Text  style={{fontSize:11,color:'red'}} >{desError}</Text>}
 
                        <Text style={{fontSize:15,color:"#ef5350",alignSelf:'flex-end'}}>{desL}/300</Text>
@@ -350,8 +416,10 @@ _more(){
 
 
                        <TouchableOpacity onPress={()=>this._done()}>
-                       <Text style={{fontSize:16,fontWeight:'bold',color:"navy",opacity:0.3}}>Done</Text>
+                       <Text style={{fontSize:16,fontWeight:'bold',color:"navy",}}>Done</Text>
                        </TouchableOpacity>
+
+                       
                 
                        
                    </View>
@@ -462,14 +530,18 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = state =>{
+    console.log('>>>>>>>>>',state)
     return{
-        user : state.user
+        user : state.AuthReducer.user,
+        cv: state.CvReducer.cv
+
     }
 }
 
 const mapDispatchToProps = dispatch =>{
     return{
-        add_user : (user)=>dispatch(Add_User(user))
+        add_user : (user)=>dispatch(Add_User(user)),
+        add_cv:(cv)=>dispatch(Add_Cv(cv))
     }
 }
 export default connect(mapStateToProps,mapDispatchToProps)(AddCv)

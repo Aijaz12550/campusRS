@@ -87,8 +87,9 @@ const styles = StyleSheet.create({
 })
 
 const mapStateToProps = state =>{
+    console.log('jhjh',state.AuthReducer.user)
     return{
-        user : state.user
+        user : state.AuthReducer.user
     }
 }
 

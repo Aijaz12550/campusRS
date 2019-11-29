@@ -16,6 +16,10 @@ const CV = createStackNavigator({
     CV : Routes.AddCv
 })
 
+const Mycv = createStackNavigator({
+    mycv:Routes.MyCv
+})
+
 const drawer = createDrawerNavigator({
     Home:{
         screen:Home,
@@ -26,6 +30,12 @@ const drawer = createDrawerNavigator({
     },
     CV:{
         screen:CV
+    },
+    Saved:{
+        screen:Routes.SavedJobs
+    },
+    MyCv:{
+        screen:Mycv
     }
 
     

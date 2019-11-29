@@ -2,6 +2,9 @@ import React, { Component } from 'react'
 import { View, Text,StyleSheet,TouchableHighlight,TouchableOpacity,Image,ScrollView, } from 'react-native'
 import { DrawerActions } from 'react-navigation-drawer';
 
+// redux..
+import { connect } from 'react-redux'
+import { Remove_User } from '../../store/actions/index'
 
  class DrawerContent extends Component {
 state ={
@@ -10,6 +13,13 @@ state ={
     Admin:['Companies','Students']
 }
   
+_navigate(route,param){
+    this.props.navigation.navigate(route,param)
+}
+
+_signout(){
+    this.props.signout()
+}
     render() {
         
         return (
@@ -26,36 +36,39 @@ state ={
                     <TouchableOpacity onPress={()=>this.props.navigation.navigate('Home')} underlayColor={'coral'}>
                         <View style={styles.row}>
                         
-                        <Text  style={styles.text}>Home</Text>
+                        <Text  style={[styles.text,this.props.activeItemKey == 'Home' && {color:'navy'}]}>Home</Text>
                         </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('MyPosts')}  underlayColor={'rgba(23,30,20,0.2)'}>
+                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('AllC')}  underlayColor={'rgba(23,30,20,0.2)'}>
                         <View style={styles.row}>
                         
-                        <Text  style={styles.text}>All Companies</Text>
+                        <Text  style={[styles.text,this.props.activeItemKey == 'AllC' && {color:'navy'}]}>All Companies</Text>
                         </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('MyPosts')}  underlayColor={'rgba(23,30,20,0.2)'}>
+                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('AllU')} underlayColor={'rgba(23,30,20,0.2)'}>
                         <View style={styles.row}>
                         
-                        <Text  style={styles.text}>All Students</Text>
+                        <Text  style={[styles.text,this.props.activeItemKey == 'AllU' && {color:'navy'}]}>All Users</Text>
                         </View>
                     </TouchableOpacity>
 
+                  
 
                      
 
                      
                     {/* _____________________________________________________________________ */}
                     <View style={styles.line}></View>
-                    <TouchableHighlight  underlayColor={'rgba(0,0,0,0.2)'}>
+                    
+                    <TouchableOpacity onPress={()=>this._signout()}   underlayColor={'rgba(23,30,20,0.2)'}>
                         <View style={styles.row}>
-                       
-                        <Text  style={styles.text}>SignOut</Text>
+                        
+                        <Text  style={styles.text}>Sign Out</Text>
                         </View>
-                    </TouchableHighlight>
+                    </TouchableOpacity>
+                    
                 </ScrollView>
                 </TouchableOpacity>
             </TouchableOpacity>
@@ -117,4 +130,15 @@ const styles = StyleSheet.create({
         margin:15,
     }
 })
-export default DrawerContent;
+
+const mapStateToProps = state => {
+    return{
+        cv : state.CvReducer.cv
+    }
+}
+const mapDispatchToProps = dispatch => {
+    return {
+        signout : ()=>dispatch(Remove_User())
+    }
+}
+export default  connect(mapStateToProps,mapDispatchToProps)(DrawerContent);

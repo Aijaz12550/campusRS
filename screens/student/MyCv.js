@@ -13,7 +13,7 @@ import ip from '../ip'
 
 
 
- class AddCv extends Component {
+ class My_CV extends Component {
      
     state={
         login:false,main:true,
@@ -47,7 +47,7 @@ import ip from '../ip'
      static navigationOptions = ({navigation}) => {
         return{
 
-            title: 'My Resume',
+            title: 'My CV',
                 //  toggle
             headerLeft: 
             <TouchableOpacity onPress={()=>navigation.dispatch(DrawerActions.toggleDrawer())}
@@ -83,70 +83,79 @@ import ip from '../ip'
 
 
     render(){
-        let { login,main,
-            personalDetail,
-            educationalDetail,
-            desL,
-            nameError,
-            desError,
-            pd,
-            year,month,day,
-            degree,
+        let { name, skills, year, degree, des, experience,  } = this.props.cv
 
-            designation,duration,organization,index,experience,
-
-        
-        } = this.state
-
+        /**
+         * {"__v": 0, "_id": "5dd4134a15baa6343c26fb4b", "degree": "Bachelor", "des": "Gdhdhdhdddhdj", 
+         * "experience": [{"_id": "5dde8d292a3d8f2c1ce4b5f6", "designation": "Hdhdh", "duration": "Hxhx", 
+         * "organization": "Gdhf"}], "name": "Agsg", "skills": "Gxhddu
+", "year": "2019"}
+         */
+console.log("-------------",this.props.cv)
         
         return(
             <View style={{flex:1}}>
 <StatusBar backgroundColor="#ef5350" barStyle="light-content" />
 <View style={styles.container}>
 
-{/* _____________-CARD _Personal _Detail_____________- */}
-{!personalDetail &&
-           <TouchableOpacity style={[styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} >
-                   <ScrollView>
 
-                   <View style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:10}}>
-                       <Text style={{fontSize:16,color:"#ef5350",fontWeight:'bold'}}>Personal Detail</Text>
-                   </View>
-                   <View style={{borderBottomColor:"#eee",borderBottomWidth:1,paddingBottom:5}}> 
-                       <TextInput onChangeText={(v)=>this._name(v)} placeholder="Enter Full Name" style={styles.input}/>
-                       {nameError && <Text style={{fontSize:11,color:'red'}} >{nameError}</Text>}
-
-                       <TextInput onChangeText={v=>this._des(v)} placeholder="Describe Your Self.." multiline={true} maxLength={300} style={[styles.input,{maxHeight:100}]}/>
-                       {desError && <Text  style={{fontSize:11,color:'red'}} >{desError}</Text>}
-
-                       <Text style={{fontSize:15,color:"#ef5350",alignSelf:'flex-end'}}>{desL}/300</Text>
-
-                       
-                   </View>
-                   <View style={{display:'flex',flexDirection:'row',justifyContent:'flex-end',alignItems:'flex-end',marginTop:10}}>
-                       
+<View style={{justifyContent:"center",borderRadius:15}}> 
 
 
-                       {pd ?
-                       <TouchableOpacity onPress={()=>this.setState({personalDetail:true})} >
-                           <Text style={{fontSize:16,fontWeight:'bold',color:"#ef5350"}}>Next</Text>
-                       </TouchableOpacity>
-                    :
-                    <View >
-                    <Text style={{fontSize:16,fontWeight:'bold',color:"#ef5350",opacity:0.3}}>Next</Text>
-                    </View>
-                    }
+    <View style={{flexDirection:'row',backgroundColor:'#eee',borderRadius:10,borderBottomColor:'gray',borderBottomWidth:1}}>
+    <Text style={{padding:5}}> Name :  </Text>
+     <Text style={{padding:5,paddingLeft:5,color:'#296'}}> {name} </Text>
+    </View>
 
-                       
-                   </View>
 
-                   </ScrollView>
-               </TouchableOpacity>
+    <View style={{flexDirection:'row',backgroundColor:'#eee',borderRadius:10,borderBottomColor:'gray',borderBottomWidth:1}}>
+    <Text style={{padding:5}}> Skills :  </Text>
+     <Text style={{padding:5,paddingLeft:5,color:'#296'}}> {skills} </Text>
+    </View>
 
-}
 
-       
+    <View style={{flexDirection:'row',backgroundColor:'#eee',borderRadius:10,borderBottomColor:'gray',borderBottomWidth:1}}>
+    <Text style={{padding:5}}> Highest Degree  : </Text>
+     <Text style={{padding:5,paddingLeft:5,color:'#296'}}> {degree} </Text>
+    </View>
 
+
+    <View style={{flexDirection:'row',backgroundColor:'#eee',borderRadius:10,borderBottomColor:'gray',borderBottomWidth:1}}>
+    <Text style={{padding:5}}> Degree Completion Year  :  </Text>
+     <Text style={{padding:5,paddingLeft:5,color:'#296'}}> {year} </Text>
+    </View>
+
+
+    <View style={{backgroundColor:'#eee',borderRadius:10,borderBottomColor:'gray',borderBottomWidth:1}}>
+    <Text style={{padding:5}}> Experience  :  </Text>
+
+    <View style={{backgroundColor:'#eee',borderRadius:10,marginBottom:5,flexDirection:'row'}}>
+     <Text style={{padding:5,paddingLeft:5,color:'#296',fontWeight:'bold',width:50}}> S.No </Text>
+     <Text style={{padding:5,paddingLeft:5,color:'#296',fontWeight:'bold',width:100}}> Designation </Text>
+     <Text style={{padding:5,paddingLeft:5,color:'#296',fontWeight:'bold',width:80}}> Duration </Text>
+     <Text style={{padding:5,paddingLeft:5,color:'#296',fontWeight:'bold',width:100}}> Organization </Text>
+    </View>
+
+{ experience && experience.map( ( val, key )=>{
+    return(
+
+    <View style={{backgroundColor:'#eee',borderRadius:10,marginBottom:5,flexDirection:'row'}}>
+    <Text style={{padding:5,paddingLeft:5,color:'#000',width:50}}> {key + 1} . </Text>
+     <Text style={{padding:5,paddingLeft:5,color:'#000',width:100}}> {val.designation} </Text>
+     <Text style={{padding:5,paddingLeft:5,color:'#000',width:90}}> {val.duration} </Text>
+    <Text style={{padding:5,paddingLeft:5,color:'#000',width:90}}> {val.organization}</Text>
+    </View>
+    )
+})}
+
+    </View>
+
+
+</View>
+<TouchableOpacity onPress={()=>this.props.navigation.navigate('CV')} style={{marginTop:40,backgroundColor:'#ef5350',padding:10,width:200,alignItems:'center',borderBottomEndRadius:30,
+    borderTopStartRadius:30,}}>
+    <Text style={{color:'white'}} >Edit</Text>
+</TouchableOpacity>
 </View>
 
             </View>
@@ -240,7 +249,8 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state =>{
     return{
-        user : state.user
+        user : state.AuthReducer.user,
+        cv : state.CvReducer.cv,
     }
 }
 
@@ -249,4 +259,4 @@ const mapDispatchToProps = dispatch =>{
         add_user : (user)=>dispatch(Add_User(user))
     }
 }
-export default connect(mapStateToProps,mapDispatchToProps)(AddCv)
+export default connect(mapStateToProps,mapDispatchToProps)(My_CV)

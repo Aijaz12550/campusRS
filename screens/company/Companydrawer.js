@@ -32,16 +32,9 @@ _signout(){
                     </View>
 
                     <TouchableOpacity onPress={()=>this.props.navigation.navigate('Home')} underlayColor={'coral'}>
-                        <View style={styles.row}>
+                        <View style={[styles.text,this.props.activeItemKey == 'Home' && {color:'navy'}]}>
                         
                         <Text  style={styles.text}>Home</Text>
-                        </View>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('MyPosts')}  underlayColor={'rgba(23,30,20,0.2)'}>
-                        <View style={styles.row}>
-                        
-                        <Text  style={styles.text}>My Requests</Text>
                         </View>
                     </TouchableOpacity>
 

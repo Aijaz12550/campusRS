@@ -36,23 +36,41 @@ _signout(){
                     <TouchableOpacity onPress={()=>this.props.navigation.navigate('Home')} underlayColor={'coral'}>
                         <View style={styles.row}>
                         
-                        <Text  style={styles.text}>Job Feed</Text>
+                        <Text  style={[styles.text,this.props.activeItemKey == 'Home' && {color:'navy'}]}>Job Feed</Text>
                         </View>
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={()=>this.props.navigation.navigate('MyJobs')}  underlayColor={'rgba(23,30,20,0.2)'}>
                         <View style={styles.row}>
                         
-                        <Text  style={styles.text}>My Jobs</Text>
+                        <Text  style={[styles.text,this.props.activeItemKey == 'MyJobs' && {color:'navy'}]}>My Jobs</Text>
                         </View>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('CV')}  underlayColor={'rgba(23,30,20,0.2)'}>
+                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('Saved')} underlayColor={'rgba(23,30,20,0.2)'}>
                         <View style={styles.row}>
                         
-                        <Text  style={styles.text}>Create CV</Text>
+                        <Text  style={[styles.text,this.props.activeItemKey == 'Saved' && {color:'navy'}]}>Saved Jobs</Text>
                         </View>
                     </TouchableOpacity>
+
+                    {!this.props.cv?
+
+                     <TouchableOpacity onPress={()=>this.props.navigation.navigate('CV')}  underlayColor={'rgba(23,30,20,0.2)'}>
+                        <View style={styles.row}>
+                        <Text  style={[styles.text,this.props.activeItemKey == 'CV' && {color:'navy'}]}>Create CV</Text>
+                        </View>
+                    </TouchableOpacity>
+
+                    :
+
+                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('MyCv')}  underlayColor={'rgba(23,30,20,0.2)'}>
+                        <View style={styles.row}>
+                        
+                        <Text  style={[styles.text,this.props.activeItemKey == 'MyCv' && {color:'navy'}]}>My CV</Text>
+                        </View>
+                    </TouchableOpacity>
+                   }
 
 
                      
@@ -129,9 +147,15 @@ const styles = StyleSheet.create({
         margin:15,
     }
 })
+
+const mapStateToProps = state => {
+    return{
+        cv : state.CvReducer.cv
+    }
+}
 const mapDispatchToProps = dispatch => {
     return {
         signout : ()=>dispatch(Remove_User())
     }
 }
-export default  connect(null,mapDispatchToProps)(DrawerContent);
+export default  connect(mapStateToProps,mapDispatchToProps)(DrawerContent);

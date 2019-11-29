@@ -11,7 +11,8 @@ import { Add_User,Remove_User} from '../../store/actions/index'
 import ip from '../ip'
 import img from '../company/image'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faRemoveFormat, faBox , faBoxOpen, faList, faBuilding, faUsers, } from '@fortawesome/free-solid-svg-icons'
+import { faRemoveFormat, faBox , faBoxOpen, faList, faBuilding, faUsers, faUser } from '@fortawesome/free-solid-svg-icons'
+import { FlatList } from 'react-native-gesture-handler';
 
 
 
@@ -20,7 +21,7 @@ import { faRemoveFormat, faBox , faBoxOpen, faList, faBuilding, faUsers, } from 
  class Home extends Component {
     state={
         login:false,main:true,
-        WIDTH:300,companyCount:0,textToRender:'',modal:false,modal1:false
+        WIDTH:300,companyCount:0,textToRender:'',modal:false,
     }
     constructor(props){
         super(props);
@@ -38,7 +39,7 @@ import { faRemoveFormat, faBox , faBoxOpen, faList, faBuilding, faUsers, } from 
      static navigationOptions = ({navigation}) => {
         return{
 
-            title: 'Admin',
+            title: 'All Users',
                 //  toggle
             headerLeft: 
             <TouchableOpacity onPress={()=>navigation.dispatch(DrawerActions.toggleDrawer())}
@@ -72,15 +73,13 @@ import { faRemoveFormat, faBox , faBoxOpen, faList, faBuilding, faUsers, } from 
               y:gestureState.dy
           })
          },
+         
          onPanResponderRelease:(evt,gestureState)=>{
                 if(gestureState.dx < -110){
                     this.setState({modal:true,textToRender:'Are you sure to Delete All companies.'})
                     this.position.setValue({
                         x:0,y:0
                     })
-                }
-                if(gestureState.dx > 110){
-                    this.props.navigation.navigate('AllC')
                 }
                 this.position.setValue({
                     x:0,y:0
@@ -100,16 +99,11 @@ import { faRemoveFormat, faBox , faBoxOpen, faList, faBuilding, faUsers, } from 
         },
         onPanResponderRelease:(evt,gestureState)=>{
                if(gestureState.dx > 110){
-                   
-                this.props.navigation.navigate('AllU')
+                   this.setState({modal:true})
                    this.pos.setValue({
                        x:0,y:0
                    })
                }
-               
-               this.pos.setValue({
-                x:0,y:0
-            })
         }
         
     })
@@ -117,20 +111,20 @@ import { faRemoveFormat, faBox , faBoxOpen, faList, faBuilding, faUsers, } from 
 
  componentDidMount(){
      console.log('~~props~~',this.props)
-     this._companycount()
-     this._usercount()
+     this._allusers()
+    
  }
 
 
- async _companycount(){
-     await fetch(`http://${ip}:3000/company/countcompanies`,{
+ async _allusers(){
+     await fetch(`http://${ip}:3000/users/allStudents`,{
          method:'GET',
          headers:{
              "Content-Type":'application/json',
              authorization:`Bearer ${this.props.user.token}`
          }
      }).then( res => res.json()).then( data => {
-         console.log('count',data)
+         console.log('count',data.result)
          this.setState({companyCount:data.result})
      }).catch( e=>{
          console.log('ee',e)
@@ -138,26 +132,8 @@ import { faRemoveFormat, faBox , faBoxOpen, faList, faBuilding, faUsers, } from 
  }
 
  
- async _usercount(){
-    await fetch(`http://${ip}:3000/users/countusers`,{
-        method:'GET',
-        headers:{
-            "Content-Type":'application/json',
-            authorization:`Bearer ${this.props.user.token}`
-        }
-    }).then( res => res.json()).then( data => {
-        console.log('count_users',data)
-        this.setState({userCount:data.result})
-    }).catch( e=>{
-        console.log('ee',e)
-    })
-}
-
-
-
- 
-async _deleteAllUsers(){
-    await fetch(`http://${ip}:3000/users/deleteAllstudents`,{
+ async _deleteAllUsers(id){
+    await fetch(`http://${ip}:3000/users/deleteUser/${id}`,{
         method:'DELETE',
         headers:{
             "Content-Type":'application/json',
@@ -172,101 +148,46 @@ async _deleteAllUsers(){
     })
 }
 
-
-
-
- 
-async _deleteAllCompanies(){
-    await fetch(`http://${ip}:3000/company/deleteAllCompanies`,{
-        method:'DELETE',
-        headers:{
-            "Content-Type":'application/json',
-            authorization:`Bearer ${this.props.user.token}`
-        }
-    }).then( res => res.json()).then( data => {
-        console.log('count_users',data)
-        this.setState({modal:false,id:null})
-    }).catch( e=>{
-        console.log('ee',e)
-        this.setState({modal:false,id:null})
-    })
-}
 
     render(){
-        let { login,main,companyCount,userCount, modal, textToRender,modal1, WIDTH } = this.state
+        let { login,main,companyCount,userCount, modal, textToRender,id } = this.state
         return(
             <View style={{flex:1}}>
 <StatusBar backgroundColor="#ef5350" barStyle="light-content" />
-
-{ WIDTH < 500 && <ImageBackground source={{uri:img}} style={[styles.banner]} ></ImageBackground>}
 <View style={styles.container}>
-<ScrollView contentContainerStyle={{alignItems:'center',justifyContent:'center'}}>
 
+<FlatList
+data={companyCount}
+renderItem={({item})=>
            <Animated.View 
            {...this.PanResponder.panHandlers}
            style={[{transform:this.position.getTranslateTransform()},styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} onPress={()=>this.props.navigation.dispatch(DrawerActions.openDrawer())}>
                    <View style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:10,flexDirection:'column'}}>
-                       <FontAwesomeIcon icon={faBuilding} size={25} color="#ef5350" />
-                       <Text style={{fontSize:16,fontWeight:'bold',color:"#ef5350"}}>Companies</Text>
+                       <FontAwesomeIcon icon={faUser} size={25} color="#296" />
+                       <Text style={{fontSize:16,fontWeight:'bold',color:"#296"}}> {item.name} </Text>
                    </View>
 
                    <View style={{borderBottomColor:"#eee",borderBottomWidth:1,paddingBottom:5}}> 
                       
-                       <Text >Total Registerd Companies : {companyCount} </Text>
+                   <Text style={{marginTop:9}} >Last Degree  : {item.cv?(item.cv.degree?item.cv.degree:'Not Addeed yet'):'Not Added'} </Text>
+                   <Text style={{marginTop:9}} >Skills  : {item.cv?(item.cv.skills?item.cv.skills:'Not Addeed yet'):'Not Added'} </Text>
+                   <Text style={{marginTop:9}} >Description  : {item.cv?(item.cv.des?item.cv.des:'Not Addeed yet'):'Not Added'} </Text>
+                       
                       
                    </View>
                    <View style={{display:'flex',flexDirection:'row',justifyContent:'space-around',alignItems:'space-between',marginTop:10}}>
                        
-                   <TouchableOpacity onPress={()=>this.setState({modal:true,textToRender:'Are you sure to delete all companies.'})}>
+                   <TouchableOpacity onPress={()=>this.setState({modal:true,textToRender:`Are you sure to delete ${item.name} .`,id:item._id})}>
                        <FontAwesomeIcon icon={faBoxOpen} size={25} color="red" />
                        <Text style={{fontSize:9,color:"red"}}>Delete </Text>
                        </TouchableOpacity>
 
-                       <TouchableOpacity>
-                           <FontAwesomeIcon icon={faList} size={22} color={'#296'} />
-                       <Text style={{fontSize:9,color:"#296"}}>Detail</Text>
-                       </TouchableOpacity>
                    </View>
 
                    
                </Animated.View>
-
-
-               <Animated.View
-               {...this.Pan.panHandlers}
-                style={[ {transform:this.pos.getTranslateTransform()}, styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} onPress={()=>this.props.navigation.dispatch(DrawerActions.openDrawer())}>
-                   <View style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:10}}>
-                       <FontAwesomeIcon icon={faUsers} color="#ef5350" size={25} />
-                       <Text style={{fontSize:16,fontWeight:'bold',color:"#ef5350"}}>Users</Text>
-                   </View>
-
-                   <View style={{borderBottomColor:"#eee",borderBottomWidth:1,paddingBottom:5}}> 
-                       
-                       <Text >Total Registerd Users : {userCount}  </Text>
-                     
-                   </View>
-
-                   <View style={{display:'flex',flexDirection:'row',justifyContent:'space-around',alignItems:'center',marginTop:10}}>
-                       
-                     
-                   <TouchableOpacity onPress={()=>this.setState({modal1:true,textToRender:'Are you sure to delete all users.'})} >
-                       <FontAwesomeIcon icon={faBoxOpen} size={25} color="red" />
-                       <Text style={{fontSize:9,color:"red"}}>Delete </Text>
-                       </TouchableOpacity>
-
-                       <TouchableOpacity>
-                           <FontAwesomeIcon icon={faList} size={22} color={'#296'} />
-                       <Text style={{fontSize:9,color:"#296"}}>Detail</Text>
-                       </TouchableOpacity>
-                   </View>
-
-                   
-               </Animated.View>
-
-
-              
-
-</ScrollView>
+}
+/>
 
 
 
@@ -294,47 +215,7 @@ async _deleteAllCompanies(){
                               <Text style={{color:'white',textAlign:'center'}} >No</Text>
                           </TouchableOpacity>
 
-                          <TouchableOpacity onPress={()=>this._deleteAllCompanies()} style={{margin:10,width:80,backgroundColor:'#296',padding:5}} >
-                              <Text style={{color:'white',textAlign:'center'}}  >Yes</Text>
-                          </TouchableOpacity>
-
-                      </View>
-
-                  </View>
-              </Modal>
-
-              {/* ------------------------------------------------------------------------------------- */}
-
-
-
-
-
-              {/* ============================================ */}
-              
-{/* ---------------------------------model to confirm delete---------------- */}
-<Modal 
-              style={{justifyContent:'center',padding:10,}}
-               isVisible={modal1}
-               backdropColor="#ef5350"
-               backdropOpacity={0.3}
-               animationIn='slideInLeft' 
-               animationInTiming={400} 
-               swipeDirection={['left','right']} 
-               onSwipeComplete={()=>this.setState({modal1:false})}
-               >
-                  <View style={{backgroundColor:'#eee',flex:0.2,justifyContent:'space-around',borderRadius:10}} >
-
-                  <View style={{justifyContent:'center',alignItems:'center',borderRadius:10}}>
-                  <Text style={{color:'#ef5350',textAlign:'center',fontSize:16,fontWeight:'bold'}} >{textToRender}</Text>
-                  </View>
-
-                      <View style={{justifyContent:'center',alignItems:'center',flexDirection:'row'}} >
-
-                          <TouchableOpacity  onPress={()=>this.setState({modal1:false})} style={{margin:10,width:80,backgroundColor:'#ef5350',padding:5}}>
-                              <Text style={{color:'white',textAlign:'center'}} >No</Text>
-                          </TouchableOpacity>
-
-                          <TouchableOpacity onPress={()=>this._deleteAllUsers()} style={{margin:10,width:80,backgroundColor:'#296',padding:5}} >
+                          <TouchableOpacity onPress={()=>this._deleteAllUsers(id)} style={{margin:10,width:80,backgroundColor:'#296',padding:5}} >
                               <Text style={{color:'white',textAlign:'center'}}  >Yes</Text>
                           </TouchableOpacity>
 

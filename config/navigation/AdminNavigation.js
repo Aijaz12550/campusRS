@@ -5,16 +5,29 @@ import { createDrawerNavigator } from 'react-navigation-drawer'
 import * as Routes from '../../screens/admin/AdminIndex'
 
 const Home = createStackNavigator({
-    Home:Routes.Home
+    Home:Routes.Home,
+    // AllC:Routes.AllCompanies,
+    // AllU:Routes.AllUsers,
+    CompanyDetail:Routes.CompanyDetail,
+})
+
+const AllC = createStackNavigator({
+      AllC :Routes.AllCompanies,
+      CompanyDetail:Routes.CompanyDetail,
+      
+})
+
+const AllU = createStackNavigator({
+    AllU:Routes.AllUsers
 })
 
 const drawer = createDrawerNavigator({
     Home:{
         screen:Home,
-        // navigationOptions: ({navigation}) => ({
-        //     drawerLockMode: 'locked-closed'
-        //   })
+        
     },
+    AllC,
+    AllU
 
     
 
@@ -31,3 +44,8 @@ const drawer = createDrawerNavigator({
 
 
 export default createAppContainer(drawer)
+
+
+// navigationOptions: ({navigation}) => ({
+        //     drawerLockMode: 'locked-closed'
+        //   })

@@ -87,7 +87,7 @@ const RecentsRoute = () => <Text>Recents</Text>;
           ]
         return(
             <View style={{flex:1}}>
-                <StatusBar backgroundColor="#eee" barStyle="dark-content" />
+                {/* <StatusBar backgroundColor="#ef5350" barStyle="light-content" /> */}
 <ImageBackground style={[styles.banner]} source={{uri:img}}>
 
 <View style={{display:'flex',flexDirection:'row',justifyContent:'space-between'}}>
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state =>{
     return{
-        user : state.user
+        user : state.AuthReducer.user
     }
 }
 

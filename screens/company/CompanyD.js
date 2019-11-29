@@ -58,22 +58,22 @@ import img from './image'
 
     <TouchableOpacity style={[styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} >
 
-        <View style={{borderBottomColor:"#eee",borderBottomWidth:1,paddingBottom:5}}> 
-            <Text style={{fontSize:16,fontWeight:'bold',color:'white'}}>History :</Text>
+        <View style={{borderBottomColor:"#ef5350",borderBottomWidth:1,paddingBottom:5}}> 
+            <Text style={{fontSize:16,fontWeight:'bold',color:'#ef5350'}}>History :</Text>
             <View>
- <Text style={{color:'white',fontSize:16}} >Registration Date : {this.props.item.timestamp}</Text>
- <Text style={{color:'white',fontSize:16}} >Location : {this.props.item.location}</Text>
- <Text style={{color:'white',fontSize:16}} >Total employees : {this.props.item.totalEmployees}</Text>
-        <Text style={{color:'white',fontSize:16}}>Total Jobs Posted : {this.props.item.activeJobs.length}</Text>
-            <Text style={{color:'white',fontSize:16}}>Total Hired : 10</Text>
- <Text style={{color:'#255',fontSize:16}}>Active Jobs : {this.props.item.activeJobs.length - this.props.item.closeJobs.length }</Text>
- <Text style={{color:'yellow',fontSize:16}}>Closed Jobs : {this.props.item.closeJobs.length}</Text>
+ <Text style={{color:'black',fontSize:16}} >Registration Date : {this.props.item.timestamp}</Text>
+ <Text style={{color:'black',fontSize:16}} >Location : {this.props.item.location}</Text>
+ <Text style={{color:'black',fontSize:16}} >Total employees : {this.props.item.totalEmployees}</Text>
+        <Text style={{color:'black',fontSize:16}}>Total Jobs Posted : {this.props.item.activeJobs.length}</Text>
+            <Text style={{color:'black',fontSize:16}}>Total Hired : 10</Text>
+ <Text style={{color:'#296',fontSize:16}}>Active Jobs : {this.props.item.activeJobs.length - this.props.item.closeJobs.length }</Text>
+ <Text style={{color:'#ef5350',fontSize:16}}>Closed Jobs : {this.props.item.closeJobs.length}</Text>
         </View>
 
 
         </View>
         <View style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:10,marginTop:10}}>
-            <Text style={{fontSize:14,fontWeight:'bold',color:"#eee"}}>{this.props.item.description}</Text>
+            <Text style={{fontSize:14,fontWeight:'bold',color:"#ef5350"}}>{this.props.item.description}</Text>
             <Text >Services : {this.props.item.service}</Text>
         </View>
         
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
 
     },
     card:{
-        backgroundColor:'#ef5350',
+        backgroundColor:'#eee',
         margin:10,
         padding:10,
         borderRadius:5,
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state =>{
     return{
-        user : state.user
+        user : state.AuthReducer.user
     }
 }
 
