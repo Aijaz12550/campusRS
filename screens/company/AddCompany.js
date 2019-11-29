@@ -1,6 +1,6 @@
 import React , { Component } from 'react'
 import {
-View, Text, TouchableOpacity, TextInput, StyleSheet,SafeAreaView,Dimensions,ScrollView,StatusBar, Slider
+View, Text, TouchableOpacity, TextInput, StyleSheet,SafeAreaView,Dimensions,ScrollView,StatusBar, Slider,ActivityIndicator,Alert
 } from "react-native"
  import Svg from "react-native-svg"
 import Modal from 'react-native-modal'
@@ -15,7 +15,7 @@ import ip from '../ip'
  class Home extends Component {
     state={
         login:false,main:true,
-        WIDTH:300,
+        WIDTH:300,loader:false
     }
     constructor(props){
         super(props);
@@ -61,35 +61,46 @@ import ip from '../ip'
 //  ---------------------------------------------------------------------------
 
  async _addCompany(){
+     this.setState({loader:true})
      let { cname,ser,des,emp,loc, } = this.state
      let timestamp = new Date().getTime()
      console.log('chala..')
-     await fetch(`http://${ip}:3000/company/addCompany`,{
-         method:'POST',
-         headers:{
-             "Content-Type":"application/json",
-             "authorization":`Bearer ${this.props.user.token}`
+     if(cname  && ser  && des  && emp && loc){
+         
+         await fetch(`https://pacific-shore-10571.herokuapp.com/company/addCompany`,{
+             method:'POST',
+             headers:{
+                 "Content-Type":"application/json",
+                 "authorization":`Bearer ${this.props.user.token}`
          },
          body:JSON.stringify({
-            companyName :cname,
-            service:ser,
-            totalEmployees:emp,
+             companyName :cname,
+             service:ser,
+             totalEmployees:emp,
             location:loc,
             description:des,
             ownerId:this.props.user._id,
             timestamp,
-         })
-     }).then(res=>res.json())
-     .then(result=>{
-         console.log('result~~~',result)
+        })
+    }).then(res=>res.json())
+    .then(result=>{
+        this.setState({loader:false})
+        console.log('result~~~',result)
+        if(result.result){
+             this.props.navigation.navigate('Home')
+         }
      })
-
+     
+    }else{
+        this.setState({loader:false})
+        Alert.alert("Please fill the form correctly.")
+    }
 }
 
 
     render(){
         // this.props.r_u()
-        let { login,main } = this.state
+        let { login,main,loader } = this.state
         return(
             <View style={{flex:1}}>
 <StatusBar backgroundColor="#ef5350" barStyle="light-content" />
@@ -99,31 +110,31 @@ import ip from '../ip'
 
 <ScrollView style={{width:this.state.WIDTH}}>
 
-<Form>
-            <Item floatingLabel>
-              <Label style={{color:'white',fontSize:14}}>Company Name</Label>
-              <Input onChangeText={(v)=>this.setState({cname:v})}  maxLength={25}/>
+<Form style={{backgroundColor:'#eee',marginTop:10,padding:5,paddingBottom:40,borderRadius:15,elevation:10}}>
+            <Item floatingLabel style={{borderBottomColor:'red',borderBottomWidth:1}}>
+              <Label style={{color:'#ef5350',fontSize:14,}}>Company Name</Label>
+              <Input  onChangeText={(v)=>this.setState({cname:v})}  maxLength={25}/>
             </Item>
 
-            <Item floatingLabel>
-              <Label style={{color:'white',fontSize:14}}>Main Service of Company</Label>
+            <Item floatingLabel style={{borderBottomColor:'red',borderBottomWidth:1}}>
+              <Label style={{color:'#ef5350',fontSize:14}}>Main Service of Company</Label>
               <Input onChangeText={(v)=>this.setState({ser:v})} maxLength={25} />
             </Item>
 
-            <Item floatingLabel>
-              <Label style={{color:'white',fontSize:14}}>No Of Employees Working</Label>
+            <Item floatingLabel style={{borderBottomColor:'red',borderBottomWidth:1}}>
+              <Label style={{color:'#ef5350',fontSize:14}}>No Of Employees Working</Label>
               <Input onChangeText={(v)=>this.setState({emp:v})} keyboardType="number-pad" maxLength={4} />
             </Item>
 
-            <Item floatingLabel>
-              <Label style={{color:'white',fontSize:14}}>Location (Karachi e.t.c)</Label>
+            <Item floatingLabel style={{borderBottomColor:'red',borderBottomWidth:1}}>
+              <Label style={{color:'#ef5350',fontSize:14}}>Location (Karachi e.t.c)</Label>
               <Input onChangeText={(v)=>this.setState({loc:v})} maxLength={10} />
             </Item>
             
 
-            <Item floatingLabel>
+            <Item floatingLabel style={{borderBottomColor:'red',borderBottomWidth:1}}>
               
-            <Label style={{color:'white',fontSize:14}}>Description</Label>
+            <Label style={{color:'#ef5350',fontSize:14}}>Description</Label>
               <Input onChangeText={(v)=>this.setState({des:v})} multiline={true} maxLength={100} style={{maxHeight:150}} />
             </Item>
           </Form>
@@ -131,7 +142,8 @@ import ip from '../ip'
           {/* <Spinner color="white" /> */}
               
           <TouchableOpacity onPress={()=>this._addCompany()} style={styles.btn}>
-                <Text style={styles.btnText} >Submit</Text>
+              { loader ?<ActivityIndicator color="white" size={25} />:
+                <Text style={styles.btnText} >Submit</Text>}
             </TouchableOpacity>
 </ScrollView>
               
@@ -146,7 +158,7 @@ import ip from '../ip'
 const styles = StyleSheet.create({
     container:{
         flex:1,
-        backgroundColor:'#ef5350',
+        backgroundColor:'lightgray',
         justifyContent:'center',
         alignItems:'center'
     },
@@ -155,7 +167,7 @@ const styles = StyleSheet.create({
         flex:1
     },
     btn:{
-        backgroundColor:'white',
+        backgroundColor:'#ef5350',
         height:45,
         margin:20,
         borderBottomEndRadius:30,
@@ -164,11 +176,12 @@ const styles = StyleSheet.create({
         maxWidth:170,
         alignSelf:'center',
         width:'100%',
-        marginTop:30
+        marginTop:30,
+        elevation:10
     },
     btnText:{
         alignSelf:'center',
-        color:'#ef5350'
+        color:'white'
     },
     hd:{
         backgroundColor:'#ef5350',

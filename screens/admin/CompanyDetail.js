@@ -118,7 +118,7 @@ import { faRemoveFormat, faBox , faBoxOpen, faList, faBuilding, faUsers,faPerson
 
 
  async _companydetail(id){
-     await fetch(`http://${ip}:3000/company/companyDetail/${id}`,{
+     await fetch(`https://pacific-shore-10571.herokuapp.com/company/companyDetail/${id}`,{
          method:'GET',
          headers:{
              "Content-Type":'application/json',
@@ -134,7 +134,7 @@ import { faRemoveFormat, faBox , faBoxOpen, faList, faBuilding, faUsers,faPerson
 
  
  async _deletejob(id){
-    await fetch(`http://${ip}:3000/company/deletejob/${id}`,{
+    await fetch(`https://pacific-shore-10571.herokuapp.com/company/deletejob/${id}`,{
         method:'DELETE',
         headers:{
             "Content-Type":'application/json',

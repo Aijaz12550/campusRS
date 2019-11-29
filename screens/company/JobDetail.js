@@ -18,13 +18,6 @@ import ShortList from './jobs/shortlisted'
 import Selected from './jobs/selected'
 import ip from '../ip'
 
-
-const MusicRoute = () => <Text style={[ { backgroundColor: '#673ab7',flex:1 }]}>Music</Text>;
-
-const AlbumsRoute = () => <Text  style={[ { backgroundColor: '#ef5350',flex:1 }]}>Albums</Text>;
-
-const RecentsRoute = () => <Text>Recents</Text>;
- 
   
 
  class Home extends Component {
@@ -35,11 +28,6 @@ const RecentsRoute = () => <Text>Recents</Text>;
         WIDTH:300,
         item:this.props.navigation.getParam('company'),
         index: 0,result:[],
-    // routes: [
-    //   { key: 'music', title: 'Home', icon: props=><FontAwesomeIcon  color={'#296'} icon={faHome} /> , color:'#ef5350'},
-    //   { key: 'albums', title: 'Active Jobs', icon: ()=><FontAwesomeIcon icon={faMale} /> ,color:'pink' },
-    //   { key: 'recents', title: 'Closed Jobs', icon: ()=><FontAwesomeIcon icon={faDoorClosed} />,color:'#eee'},
-    // ],
     }
     constructor(props){
         super(props);
@@ -58,9 +46,9 @@ const RecentsRoute = () => <Text>Recents</Text>;
 
  componentDidMount(){
      console.log('~~param~~>>>>',this.props.navigation.getParam('job'))
-     let {applications,_id} = this.props.navigation.getParam('job')
+     let {applications,_id,title} = this.props.navigation.getParam('job')
      this.setState({
-         jobid:_id
+         jobid:_id,title
      })
      let idArray = [];
 
@@ -78,7 +66,7 @@ const RecentsRoute = () => <Text>Recents</Text>;
 
 //  __________________________get applicants
 //  async _getApplicants(){
-//      fetch(`http://${ip}:3000/company/applicants`,{
+//      fetch(`https://pacific-shore-10571.herokuapp.com/company/applicants`,{
 //          method:'POST',
 //          headers:{
 //              "Content-Type":"application/json",
@@ -117,7 +105,7 @@ const RecentsRoute = () => <Text>Recents</Text>;
  });
 
     render(){
-        let { login,main,index } = this.state
+        let { login,main,index,title } = this.state
        const routes = [
             { key: 'music', title: 'Pending', icon: props=><FontAwesomeIcon  color={index == 0 &&'white'} size={index == 0 ? 23:18} icon={faFlagCheckered} /> , color:'#ef5350'},
             { key: 'albums', title: 'Short listed', icon: ()=><FontAwesomeIcon color={index == 1 &&'#296'} size={index == 1 ? 23:18} icon={faList} /> ,color:'#ffab00' },
@@ -133,7 +121,7 @@ const RecentsRoute = () => <Text>Recents</Text>;
 </TouchableOpacity>
 
 <TouchableOpacity style={{alignSelf:'center',backgroundColor:'#ef5350',borderRadius:15,paddingLeft:10,paddingRight:10,padding:4,marginBottom:10,elevation:10}}>
-    <Text style={{color:'white',fontSize:15,}}>React Native Developer</Text>
+    <Text style={{color:'white',fontSize:15,}}>{ title?title: "React Native Developer"}</Text>
 </TouchableOpacity>
 
 

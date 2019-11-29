@@ -79,7 +79,7 @@ const RecentsRoute = () => <Text>Recents</Text>;
  });
 
     render(){
-        let { login,main,index,search } = this.state
+        let { login,main,index,search,item } = this.state
        const routes = [
             { key: 'music', title: 'Home', icon: props=><FontAwesomeIcon  color={index == 0 &&'#ef5350'} size={index == 0 ? 23:18} icon={faHome} /> , color:'white'},
             { key: 'albums', title: 'Active Jobs', icon: ()=><FontAwesomeIcon color={index == 1 &&'white'} size={index == 1 ? 23:18} icon={faMale} /> ,color:'#ffab00' },
@@ -111,7 +111,7 @@ const RecentsRoute = () => <Text>Recents</Text>;
 
 </View>
 <TouchableOpacity style={{alignSelf:'center',backgroundColor:'#ef5350',borderRadius:15,paddingLeft:10,paddingRight:10,padding:4,marginBottom:10,elevation:10}}>
-    <Text style={{color:'white',fontSize:15,}}>The Future Technology solution</Text>
+    <Text style={{color:'white',fontSize:15,}}> {item?item.companyName:'The Futur Technology'} </Text>
 </TouchableOpacity>
 
 </ImageBackground>

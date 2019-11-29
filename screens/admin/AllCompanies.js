@@ -1,151 +1,101 @@
-import React , { Component } from 'react'
-import {
-View, Text, TouchableOpacity, TextInput, StyleSheet,SafeAreaView,Dimensions,ScrollView,StatusBar, ImageBackground, Animated, PanResponder, FlatList
-} from "react-native"
- import Svg from "react-native-svg"
+import React, { Component } from 'react'
+import { View, 
+    Text, 
+    StyleSheet,
+    TouchableOpacity,
+    Animated,
+    PanResponder,
+    Dimensions,
+    UIManager,
+    LayoutAnimation,
+} from 'react-native'
+
 import Modal from 'react-native-modal'
-import { DrawerActions } from 'react-navigation-drawer';
 import { connect } from 'react-redux'
 // import { Add_User,Remove_User} from '../store/actions/index'
 import { Add_User,Remove_User} from '../../store/actions/index'
-import ip from '../ip'
-import img from '../company/image'
+
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import { faRemoveFormat, faBox , faBoxOpen, faList, faBuilding, faUsers, } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
 
 
+ class List extends Component{
+state={
+    WIDTH:300,modal:false,textAlign:'',id:null
+}
 
-
-
- class Home extends Component {
-    state={
-        login:false,main:true,
-        WIDTH:300,companyCount:0,textToRender:'',modal:false, id :null
-    }
     constructor(props){
         super(props);
-        this.position= new Animated.ValueXY()
-        this.pos = new Animated.ValueXY()
         Dimensions.addEventListener('change',(dims)=>{
             this.setState({
                 WIDTH:Dimensions.get('window').width > 500 ? 500 :300
             })
         })
+
+
+        UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true)
+        this.panResponder = PanResponder.create({
+
+            onStartShouldSetPanResponder : () => false,
+            onStartShouldSetPanResponderCapture : () => false,
+            onMoveShouldSetResponderCapture : ()=> true,
+
+            onMoveShouldSetPanResponderCapture : ( evt, gestureState ) => {
+                const { dx, dy } = gestureState;
+                if(dx>2 || dx < -2 || dy > 5 || dy < -5) {
+                    return true;
+                }else{return false;}
+            },
+
+            onPanResponderMove : ( evt, gestureState ) => {
+                this.onMoveX(gestureState.dx);
+            },
+            onPanResponderTerminate : ( evt, gestureState ) => {
+                this.onPanResponderRelease(gestureState);
+            },
+            onPanResponderRelease : ( evt, gestureState ) => {
+                this.onPanResponderRelease(gestureState);
+            }
+
+            
+        })
     }
 
-
-     // CUSTOMIZATION OF STACK HEADER
-     static navigationOptions = ({navigation}) => {
-        return{
-
-            title: 'All Companies',
-                //  toggle
-            headerLeft: 
-            <TouchableOpacity 
-             onPress={()=>navigation.dispatch(DrawerActions.toggleDrawer())}
-             style={{ display:'flex',flexDirection:'column',marginLeft:10,alignSelf:"center",}}>
-
-        <Text style={{  width:30,height:3,backgroundColor:'white',alignSelf:"center", marginBottom:4.5}}></Text>
-        <Text style={{  width:30,height:3,backgroundColor:'white',alignSelf:"center", marginBottom:4.5}}></Text>
-        <Text style={{  width:30,height:3,backgroundColor:'white',alignSelf:"center", marginBottom:4.5}}></Text>
-         </TouchableOpacity>,
-    //   toggle end
-
-        headerStyle: {
-            backgroundColor:'#ef5350'
-            // backgroundColor: '#946638',
-        },
-        headerTintColor: 'white',
-        headerTitleStyle: {
-            fontWeight: 'bold',
-            color:'white'
-        },
+    onMoveX = (dx) => {
+        this.refs['task'].setNativeProps({style:{transform :[{translateX:dx}]}})
     }
- };
 
- componentWillMount(){
-     this.PanResponder = PanResponder.create({
-        //  onPanResponderTerminationRequest:()=>false,
-        //  onStartShouldSetPanResponderCapture: () => true,
-         onStartShouldSetPanResponder:(evt,gestureState)=>true,
-         onPanResponderMove:(evt,gestureState)=>{
-             console.log('event',evt)
-          this.position.setValue({
-              x : gestureState.dx,
-              y:gestureState.dy
-          })
-         },
-         onPanResponderRelease:(evt,gestureState)=>{
-                // if(gestureState.dx < -110){
-                //     this.setState({modal:true,textToRender:'Are you sure to Delete All companies.'})
-                //     this.position.setValue({
-                //         x:0,y:0
-                //     })
-                // }
-                this.position.setValue({
-                    x:0,y:0
-                })
-         }
-         
-     })
+    onPanResponderRelease = ( gestureState ) => {
+        console.log('pan_val',Math.abs(gestureState.dx))
+        if (Math.abs(gestureState.dx) < Dimensions.get('window').width/2){
 
-     this.Pan = PanResponder.create({
-        onStartShouldSetPanResponder:(evt,gestureState)=>true,
-        onPanResponderMove:(evt,gestureState)=>{
-            console.log('pan',gestureState.dx,"y>>",gestureState.dy,evt)
-         this.pos.setValue({
-             x : gestureState.dx,
-             y:gestureState.dy
-         })
-        },
-        onPanResponderRelease:(evt,gestureState)=>{
-            //    if(gestureState.dx > 110){
-            //        this.setState({modal:true})
-            //        this.pos.setValue({
-            //            x:0,y:0
-            //        })
-            //    }
+            this.refs['task'].setNativeProps({style:{transform:[{translateX:0}]}})
         }
-        
-    })
- }
+        if(Math.abs(gestureState.dx)>= Dimensions.get('window').width/2){
+            LayoutAnimation.configureNext(LayoutAnimation.create(300, "easeInEaseOut", 'opacity'))
+            this.refs['task'].setNativeProps({style:{transform:[{translateX:Dimensions.get('window').width}]}})
+            // this.props.handleDeleteTask(this.props.item.id);
+        }
+    }
 
- componentDidMount(){
-     console.log('~~props~~',this.props)
-     this._companycount()
+
+    // ---------------------------------------
     
- }
-
-
- async _companycount(){
-     await fetch(`http://${ip}:3000/company/getAllCompanies`,{
-         method:'GET',
-         headers:{
-             "Content-Type":'application/json',
-             authorization:`Bearer ${this.props.user.token}`
-         }
-     }).then( res => res.json()).then( data => {
-         console.log('company',data)
-         this.setState({companies:data.result})
-     }).catch( e=>{
-         console.log('ee',e)
-     })
- }
-
- 
  async _deleteCompany(id){
-    await fetch(`http://${ip}:3000/company/deleteOneCompany/${id}`,{
+    await fetch(`https://pacific-shore-10571.herokuapp.com/company/deleteOneCompany/${id}`,{
         method:'DELETE',
         headers:{
             "Content-Type":'application/json',
-            authorization:`Bearer ${this.props.user.token}`
+            authorization:`Bearer ${this.props.token}`
         }
     }).then( res => res.json()).then( data => {
         this.setState({
             id:null,
             modal:false
+            
         })
+        this.props.getAll(this.props.token,this.props.this)
         console.log('delete_company',data)
         
     }).catch( e=>{
@@ -154,52 +104,55 @@ import moment from 'moment'
 }
 
 
-    render(){
-        let { login,main,companyCount,userCount, modal, textToRender, companies, id } = this.state
-        return(
-            <View style={{flex:1}}>
-                <StatusBar backgroundColor="#ef5350" barStyle="light-content" />
-<View style={styles.container}>
+    
 
-    <FlatList
-    data={companies}
-    renderItem={({item})=> <Animated.View 
-        {...this.PanResponder.panHandlers}
-        style={[{transform:this.position.getTranslateTransform()},styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} onPress={()=>this.props.navigation.dispatch(DrawerActions.openDrawer())}>
+
+    render(){
+        let { modal, textToRender, id } = this.state;
+        return(
+            
+
+               <Animated.View 
+               ref='task'
+    {...this.panResponder.panHandlers}
+   
+        style={[styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} >
+                
+                
                 <View style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:10,flexDirection:'column'}}>
                     <FontAwesomeIcon icon={faBuilding} size={25} color="navy" />
-    <Text style={{fontSize:16,fontWeight:'bold',color:"navy"}}>{item.companyName}</Text>
+    <Text style={{fontSize:16,fontWeight:'bold',color:"navy"}}>{this.props.item.companyName}</Text>
                 </View>
+
+
 
                 <View style={{borderBottomColor:"#eee",borderBottomWidth:1,paddingBottom:5}}> 
                    
-                    <Text >Added :{moment(JSON.parse(item.timestamp)).fromNow()} </Text>
+                    <Text >Added :{moment(JSON.parse(this.props.item.timestamp)).fromNow()} </Text>
                    
-                    <Text style={{marginTop:7}}>Total Employees :{item.totalEmployees} </Text>
-                    <Text style={{marginTop:7}}>Total Jobs Posted :{item.activeJobs.length} </Text>
-                    <Text style={{marginTop:7}}>Location :{item.location} </Text>
-                    <Text style={{marginTop:7}}>Services :{item.service} </Text>
+                    <Text style={{marginTop:7}}>Total Employees :{this.props.item.totalEmployees} </Text>
+                    <Text style={{marginTop:7}}>Total Jobs Posted :{this.props.item.activeJobs.length} </Text>
+                    <Text style={{marginTop:7}}>Location :{this.props.item.location} </Text>
+                    <Text style={{marginTop:7}}>Services :{this.props.item.service} </Text>
 
                    
                 </View>
                 <View style={{display:'flex',flexDirection:'row',justifyContent:'space-around',alignItems:'space-between',marginTop:10}}>
                     
-                <TouchableOpacity onPress={()=>this.setState({modal:true,textToRender:`Are you sure to delete ${item.companyName}`,id:item._id})}>
+                <TouchableOpacity onPress={()=>this.setState({modal:true,textToRender:`Are you sure to delete ${this.props.item.companyName}`,id:this.props.item._id})}>
                     <FontAwesomeIcon icon={faBoxOpen} size={25} color="red" />
                     <Text style={{fontSize:9,color:"red"}}>Delete </Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('CompanyDetail',{id:item._id})} >
+                    <TouchableOpacity onPress={()=>this.props.navigation.navigate('CompanyDetail',{id:this.props.item._id})} >
                         <FontAwesomeIcon icon={faList} size={22} color={'#296'} />
                     <Text style={{fontSize:9,color:"#296"}}>Detail</Text>
                     </TouchableOpacity>
                 </View>
 
                 
-            </Animated.View>
-            }
-            keyExtractor={item=>item._id}
-    />
+
+                
 
 {/* ---------------------------------model to confirm delete---------------- */}
               <Modal 
@@ -234,26 +187,43 @@ import moment from 'moment'
               </Modal>
 
               {/* ------------------------------------------------------------------------------------- */}
-
-</View>
-
-            </View>
-           
+            </Animated.View>
+            
         )
     }
 }
 
+
+
 const styles = StyleSheet.create({
-    container:{
-        flex:1,
-        backgroundColor:'lightgray',
-        justifyContent:'center',
-        alignItems:'center'
+    item:{
+        flexDirection:'row',
+        alignItems:'center',
+        backgroundColor:'white'
     },
-    modal:{
-        margin:0,
-        flex:1
+    absolute:{
+        position:'absolute',
+        width:'100%',
+        height:'100%',
+        justifyContent:'space-between',
+        alignItems:'center',
+        backgroundColor:'red',
+        flexDirection:'row'
     },
+    text:{
+        marginVertical:20,
+        fontSize:20,
+        marginLeft:10,
+    },
+    menu:{
+        width:20,
+        height:2,
+        backgroundColor:'silver',
+        margin:2,
+        marginHorizontal:10,
+        borderRadius:2
+    },
+    
     btn:{
         backgroundColor:'white',
         height:60,
@@ -321,6 +291,7 @@ const styles = StyleSheet.create({
     },
 })
 
+
 const mapStateToProps = state =>{
     return{
         user : state.AuthReducer.user
@@ -332,4 +303,4 @@ const mapDispatchToProps = dispatch =>{
         add_user : (user)=>dispatch(Add_User(user))
     }
 }
-export default connect(mapStateToProps,mapDispatchToProps)(Home)
+export default connect(mapStateToProps,mapDispatchToProps)(List)

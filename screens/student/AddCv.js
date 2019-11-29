@@ -158,7 +158,7 @@ _more(){
          skills,
          experience
      } = this.state
-    await fetch(`http://${ip}:3000/users/addcv`,{
+    await fetch(`https://pacific-shore-10571.herokuapp.com/users/addcv`,{
         method:'POST',
         headers:{
             "Content-Type" : 'application/json',
@@ -218,7 +218,7 @@ _more(){
         skills,
         experience
     } = this.state
-   await fetch(`http://${ip}:3000/users/updatecv`,{
+   await fetch(`https://pacific-shore-10571.herokuapp.com/users/updatecv`,{
        method:'POST',
        headers:{
            "Content-Type" : 'application/json',

@@ -1,6 +1,6 @@
 import React , { Component } from 'react'
 import {
-View, Text, TouchableOpacity, TextInput, StyleSheet,SafeAreaView,Dimensions,ScrollView,StatusBar,
+View, Text, TouchableOpacity, TextInput, StyleSheet,SafeAreaView,Dimensions,ScrollView,StatusBar,ActivityIndicator,Alert
 } from "react-native"
  import Svg from "react-native-svg"
 import Modal from 'react-native-modal'
@@ -15,7 +15,7 @@ import ip from '../ip'
  class Home extends Component {
     state={
         login:false,main:true,
-        WIDTH:300,
+        WIDTH:300,loader:false
     }
     constructor(props){
         super(props);
@@ -61,9 +61,12 @@ import ip from '../ip'
  async _addjob(){
      let { title, salary,experience, positions, skills, jobType, qualification, res  } = this.state
      console.log("~~~chala~~~")
+     this.setState({loader:true})
      let _id = this.props.navigation.getParam("owner");
-     await fetch(`http://${ip}:3000/company/addjob`,{
-         method:"POST",
+     if(_id && title && salary  && experience && positions && skills && jobType && qualification && res ){
+
+         await fetch(`https://pacific-shore-10571.herokuapp.com/company/addjob`,{
+             method:"POST",
          headers:{
              "Content-Type":'application/json',
              "authorization":`Bearer ${this.props.user.token}`
@@ -89,26 +92,31 @@ import ip from '../ip'
          
          if(result.result){
              console.log('~~~r.r~~',result.result)
-             fetch(`http://${ip}:3000/company/updateCompany`,{
-                method:"POST",
-                headers:{
-                    "Content-Type":'application/json',
-                    "authorization":`Bearer ${this.props.user.token}`
-                },
-                body:JSON.stringify({id:_id, jobId:result.result._id})
-            }).then( r => r.json())
-            .then( data => {
-                console.log('data',data)
-                this.props.navigation.navigate('Home')
-            })
-         }
-         
-     })
+             fetch(`https://pacific-shore-10571.herokuapp.com/company/updateCompany`,{
+                 method:"POST",
+                 headers:{
+                     "Content-Type":'application/json',
+                     "authorization":`Bearer ${this.props.user.token}`
+                    },
+                    body:JSON.stringify({id:_id, jobId:result.result._id})
+                }).then( r => r.json())
+                .then( data => {
+                    console.log('data',data)
+                    this.setState({loader:false})
+                    this.props.navigation.navigate('Home')
+                })
+            }
+            
+        })
+        }else{
+            this.setState({loader:false})
+            Alert.alert('Please fill the form Completly.\n Thanks')
+        }
  }
 
 
     render(){
-        let { login,main } = this.state
+        let { login,main, loader } = this.state
         return(
             <View style={{flex:1}}>
 <StatusBar backgroundColor="#ef5350" barStyle="light-content" />
@@ -166,7 +174,8 @@ import ip from '../ip'
           {/* <Spinner color="white" /> */}
               
           <TouchableOpacity onPress={()=>this._addjob()} style={styles.btn}>
-                <Text style={styles.btnText} >Submit</Text>
+              { loader ?<ActivityIndicator color="#ef5350" size={30} />:
+                <Text style={styles.btnText} >Submit</Text>}
             </TouchableOpacity>
 </ScrollView>
               

@@ -41,7 +41,7 @@ import img from '../image'
 
 
   async _alc(){
-      fetch(`http://${ip}:3000/company/getApplication`,{
+      fetch(`https://pacific-shore-10571.herokuapp.com/company/getApplication`,{
           method:'GET',
           headers:{
               "Content-Type":'application/json',
@@ -61,7 +61,7 @@ import img from '../image'
 
  async _updateStatus(id,status){
 
-     await fetch(`http://${ip}:3000/company/updateApplication`,{
+     await fetch(`https://pacific-shore-10571.herokuapp.com/company/updateApplication`,{
          method:'POST',
          headers:{
              "Content-Type":'application/json',

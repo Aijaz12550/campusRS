@@ -1,6 +1,6 @@
 import React , { Component } from 'react'
 import {
-View, Text, TouchableOpacity, TextInput, StyleSheet, ScrollView, Dimensions,ProgressBarAndroid,StatusBar
+View, Text, TouchableOpacity, TextInput, StyleSheet, ScrollView, Dimensions,ProgressBarAndroid,StatusBar, ActivityIndicator
 } from "react-native"
 import ip from './ip'
 import { DrawerActions } from 'react-navigation-drawer';
@@ -18,7 +18,7 @@ state={
         header: null,
         drawerLockMode: 'locked-closed',
         disableGestures: true,
-        data:[],
+        data:[],loader:false
       };
       componentDidMount(){
           this.setState({
@@ -29,8 +29,9 @@ state={
       
     _signin(){
         console.log('chala')
+        this.setState({loader:true})
         let { email,password } = this.state
-        fetch(`http://${ip}:3000/users/login`, {
+        fetch(`https://pacific-shore-10571.herokuapp.com/users/login`, {
           method: 'POST',
           headers: {
               'Content-Type': 'application/json'
@@ -38,10 +39,12 @@ state={
           body: JSON.stringify({ email,password })
       }).then(user=>user.json())
       .then(data=>{
+        this.setState({loader:false})
           if(data.message){
               this.setState({error:data.message})
           }
           else if(data._id){
+            this.setState({loader:false})
               console.log('>>>>>>>>>>>>>>',data)
               this.props.add_user(data)
             //   this.props.navigation.navigate('Home')
@@ -62,9 +65,9 @@ console.log('login~~~this.props',this.props)
 
             <TextInput onChangeText={(v)=>this.setState({email:v})} style={styles.input} placeholder="Email"/>
             <TextInput onChangeText={(v)=>this.setState({password:v})} style={styles.input} placeholder="passwword" secureTextEntry />
-
             <TouchableOpacity onPress={()=>this._signin()} style={styles.btn}>
-                <Text style={styles.btnText} >Submit</Text>
+                { this.state.loader && <ActivityIndicator  />}
+                { !this.state.loader && <Text style={styles.btnText} >Submit</Text>}
             </TouchableOpacity>
 
             <View style={{display:'flex',flexDirection:"row", justifyContent:'center',marginTop:40}}>

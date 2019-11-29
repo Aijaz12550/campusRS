@@ -68,7 +68,8 @@ import ip from '../ip'
 //  -----getting companies
 
    async _myCompanies(){
-       await fetch(`http://${ip}:3000/company/myCompanies`,{
+       console.log('chala')
+       await fetch(`https://pacific-shore-10571.herokuapp.com/company/myCompanies`,{
            method:'POST',
            headers:{
                "Content-Type":'application/json',

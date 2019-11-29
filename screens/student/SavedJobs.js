@@ -47,7 +47,7 @@ import moment from 'moment'
     },4000)
  }
  async _getAll(){
-    await fetch(`http://${ip}:3000/company/alljobs`,{
+    await fetch(`https://pacific-shore-10571.herokuapp.com/company/alljobs`,{
         method:"GET",
         headers:{
             "Content-Type":'application/json',
@@ -106,7 +106,7 @@ import moment from 'moment'
 //_____________________________________________________action
 
 async _newAction(action,jobId){
-    await fetch(`http://${ip}:3000/company/newAction`,{
+    await fetch(`https://pacific-shore-10571.herokuapp.com/company/newAction`,{
         method:'POST',
         headers:{
             "Content-Type":'application/json',
@@ -134,7 +134,7 @@ async _newAction(action,jobId){
 
 async _deleteAction(action_id){
 
-    await fetch(`http://${ip}:3000/company/updateAction`,{
+    await fetch(`https://pacific-shore-10571.herokuapp.com/company/updateAction`,{
         method:'POST',
         headers:{
             "Content-Type":'application/json',
@@ -153,7 +153,7 @@ async _deleteAction(action_id){
 
 // _____________________________________Apply for job
   async _applyJob(jobId){
-      await fetch(`http://${ip}:3000/company/apply`,{
+      await fetch(`https://pacific-shore-10571.herokuapp.com/company/apply`,{
           method:'POST',
           headers:{
               "Content-Type":'application/json',

@@ -117,7 +117,7 @@ import { FlatList } from 'react-native-gesture-handler';
 
 
  async _allusers(){
-     await fetch(`http://${ip}:3000/users/allStudents`,{
+     await fetch(`https://pacific-shore-10571.herokuapp.com/users/allStudents`,{
          method:'GET',
          headers:{
              "Content-Type":'application/json',
@@ -133,7 +133,7 @@ import { FlatList } from 'react-native-gesture-handler';
 
  
  async _deleteAllUsers(id){
-    await fetch(`http://${ip}:3000/users/deleteUser/${id}`,{
+    await fetch(`https://pacific-shore-10571.herokuapp.com/users/deleteUser/${id}`,{
         method:'DELETE',
         headers:{
             "Content-Type":'application/json',

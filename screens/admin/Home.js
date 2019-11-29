@@ -123,7 +123,7 @@ import { faRemoveFormat, faBox , faBoxOpen, faList, faBuilding, faUsers, } from 
 
 
  async _companycount(){
-     await fetch(`http://${ip}:3000/company/countcompanies`,{
+     await fetch(`https://pacific-shore-10571.herokuapp.com/company/countcompanies`,{
          method:'GET',
          headers:{
              "Content-Type":'application/json',
@@ -133,13 +133,13 @@ import { faRemoveFormat, faBox , faBoxOpen, faList, faBuilding, faUsers, } from 
          console.log('count',data)
          this.setState({companyCount:data.result})
      }).catch( e=>{
-         console.log('ee',e)
+         console.log('ee>>>',e)
      })
  }
 
  
  async _usercount(){
-    await fetch(`http://${ip}:3000/users/countusers`,{
+    await fetch(`https://pacific-shore-10571.herokuapp.com/users/countusers`,{
         method:'GET',
         headers:{
             "Content-Type":'application/json',
@@ -157,7 +157,7 @@ import { faRemoveFormat, faBox , faBoxOpen, faList, faBuilding, faUsers, } from 
 
  
 async _deleteAllUsers(){
-    await fetch(`http://${ip}:3000/users/deleteAllstudents`,{
+    await fetch(`https://pacific-shore-10571.herokuapp.com/users/deleteAllstudents`,{
         method:'DELETE',
         headers:{
             "Content-Type":'application/json',
@@ -177,7 +177,7 @@ async _deleteAllUsers(){
 
  
 async _deleteAllCompanies(){
-    await fetch(`http://${ip}:3000/company/deleteAllCompanies`,{
+    await fetch(`https://pacific-shore-10571.herokuapp.com/company/deleteAllCompanies`,{
         method:'DELETE',
         headers:{
             "Content-Type":'application/json',
