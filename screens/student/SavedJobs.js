@@ -151,30 +151,71 @@ async _deleteAction(action_id){
     })
 }
 
-// _____________________________________Apply for job
-  async _applyJob(jobId){
-      await fetch(`https://pacific-shore-10571.herokuapp.com/company/apply`,{
-          method:'POST',
-          headers:{
-              "Content-Type":'application/json',
-              authorization:`Bearer ${this.props.user.token}`
-          },
-          body:JSON.stringify({
-              job_id:jobId,
-              application:{
-                applicant_id:this.props.user._id,
-                status:"Pending",
-            }
-          })
 
-      }).then( res => res.json() )
-      .then( data => {
-          this._getAll()
-          console.log('~~data~~',data)
-      }).catch( e => {
-          console.log('~~error~~',e)
-      })
-  }
+
+
+// --------------------------------------
+//
+// _____________________________________Apply for job
+async _updateJob(aId,jobId){
+    await fetch(`https://pacific-shore-10571.herokuapp.com/company/apply`,{
+        method:'POST',
+        headers:{
+            "Content-Type":'application/json',
+            authorization:`Bearer ${this.props.user.token}`
+        },
+        body:JSON.stringify({
+            job_id:jobId,
+            application_id:aId
+        })
+
+    }).then( res => res.json() )
+    .then( data => {
+        this._getAll()
+        console.log('~~data~~',data)
+    }).catch( e => {
+        console.log('~~error~~',e)
+    })
+}
+
+
+//   --------------------------------------------
+
+//   -------apply for job---
+async _applyJob(cId,jobId){
+    if(this.props.cv){
+
+        console.log('chhh',jobId)
+        await fetch(`https://pacific-shore-10571.herokuapp.com/company/application`,{
+            method:'POST',
+        headers:{
+            "Content-Type":'application/json',
+            authorization:`Bearer ${this.props.user.token}`
+        },
+        body:JSON.stringify({
+           applicant_id:this.props.user._id,
+           cv_id:this.props.user._id,
+           company_id :cId,
+           job_id:jobId,
+           status:"Pending",
+        })
+    }).then( res => res.json()).then( aijaz => {
+        console.log('---aijaz',aijaz)
+        if(aijaz.result){
+            this._updateJob(aijaz.result._id,jobId)
+        }
+    }).catch( e => {
+        console.log('__error',e)
+       })
+   }else{
+       this.props.navigation.navigate('CV')
+   }
+}
+
+
+
+
+
 
     render(){
         let { login,main, companies,refreshing, setRefreshing,comps, heart, search,v,resultArray, dd, detailDekhao } = this.state
@@ -253,7 +294,7 @@ keyExtractor={item => item._id}
     ] */}
 
 {comps && toShow.map((v,k)=>{
-   
+   flag1 = false
     return(
         <View>{
     v.actions.length ? v.actions.map((nes,nesk)=>{
@@ -550,7 +591,8 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state =>{
     return{
-        user : state.AuthReducer.user
+        user : state.AuthReducer.user,
+        cv : state.CvReducer.cv
     }
 }
 

@@ -41,7 +41,7 @@ import img from '../image'
 
 
   async _alc(){
-      fetch(`https://pacific-shore-10571.herokuapp.com/company/getApplication`,{
+     await fetch(`https://pacific-shore-10571.herokuapp.com/company/getApplication`,{
           method:'GET',
           headers:{
               "Content-Type":'application/json',
@@ -50,7 +50,7 @@ import img from '../image'
               status:'Pending'
           }
       }).then( res => res.json() ).then( data => {
-          console.log('ppppppppppp',data)
+          console.log('ppppppppppp',data.result)
           this.setState({ndata:data.result,dek:true,refreshing: false})
       }).catch( e => {
           console.log('ppp ee  ,==',e)
@@ -84,6 +84,20 @@ import img from '../image'
    * "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGQ0MTM0YTE1YmFhNjM0M2MyNmZiNGIiLCJpYXQiOjE1NzQ5MjkxNjR9.cSNF6BXphXtlOkE3S6YDB6AZyaJsWkdKar35LQsDsCc", 
    * "type": "Student"},
    *  "company_id": "5dd56914a940d71d28eb5588", "job_id": "5ddd3a755e7cb6237872ea53", "status": "Pending"}]
+   * 
+
+
+
+
+
+    [{"__v": 0, "_id": "5de525d095dd6c0017d135b8", "applicant_id": {"__v": 0, "_id": "5de522f195dd6c0017d135b4", 
+    "email": "student@gmail.com", "myjobs": [Array], "name": "Aijaz",
+     "password": "$2a$10$Sq5tELJ79mIn9f4X/hgap.owo0Y1f1AKVdFfTUYocSv7X9l8gdZD.",
+      "savedJobs": [Array], 
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZGU1MjJmMTk1ZGQ2YzAwMTdkMTM1YjQiLCJpYXQiOjE1NzUyOTg1MDZ9.3WFJQQia3njvn8rdj2GPC6Eb8c-4qWiSqe47GA78n30", 
+      "type": "Student"}, "company_id": "5de515eaaccfe000175e1e87", "cv_id": {"__v": 0, "_id": "5de522f195dd6c0017d135b4", "degree": "Intermediate",
+       "des": "Tsgsvxhxhdjd",
+     "experience": [Array], "name": "Aijaz", "skills": "Vzhz", "year": "2019"}, "job_id": "5de525b395dd6c0017d135b7", "status": "Pending"}]
    */
 
   componentDidMount(){
@@ -124,11 +138,11 @@ renderItem={({item})=>
             <Text style={{fontSize:16,fontWeight:'bold',color:"white"}}> {item.applicant_id.name} </Text>
         </View>
         <View style={{borderBottomColor:"#eee",borderBottomWidth:1,paddingBottom:5}}> 
-            <Text style={{fontSize:16,fontWeight:'bold',color:'white'}}>Last degree : {item.applicant_id.cv.degree}</Text>
+            <Text style={{fontSize:16,fontWeight:'bold',color:'white'}}>Last degree : { item.cv_id && item.cv_id.degree}</Text>
             <View>
-          <Text style={{color:'white',fontSize:16}} >skills : {item.applicant_id.cv.skills}</Text>
-          <Text style={{color:'white',fontSize:16}} >Degree Completion Year : {item.applicant_id.cv.year}</Text>
-          <Text style={{color:'white',fontSize:16}} >Description : {item.applicant_id.cv.des}</Text>
+          <Text style={{color:'white',fontSize:16}} >skills : { item.cv_id && item.cv_id.skills}</Text>
+          <Text style={{color:'white',fontSize:16}} >Degree Completion Year : { item.cv_id && item.cv_id.year}</Text>
+          <Text style={{color:'white',fontSize:16}} >Description : { item.cv_id && item.cv_id.des}</Text>
 
           <View style={{}}>
     <Text style={{padding:5,color:'#eee',fontWeight:'bold',marginTop:10}}>Experience  :  </Text>
@@ -140,7 +154,7 @@ renderItem={({item})=>
      <Text style={{padding:5,paddingLeft:5,color:'#296',fontWeight:'bold',width:100,fontSize:12}}> Organization </Text>
     </View>
 
-{ item.applicant_id.cv.experience && item.applicant_id.cv.experience.map( ( val, key )=>{
+{ item.cv_id && item.cv_id.experience && item.cv_id.experience.map( ( val, key )=>{
     return(
 
     <View style={{backgroundColor:'#eee',marginBottom:5,flexDirection:'row'}}>

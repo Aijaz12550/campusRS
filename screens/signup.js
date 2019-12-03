@@ -1,6 +1,6 @@
 import React , { Component } from 'react'
 import {
-View, TouchableOpacity, TextInput, StyleSheet, ScrollView, Dimensions,ProgressBarAndroid,StatusBar,Text, ToastAndroid, 
+View, TouchableOpacity, TextInput, StyleSheet, ScrollView, Dimensions,ProgressBarAndroid,StatusBar,Text, ToastAndroid, ActivityIndicator
 } from "react-native"
 import { Picker, Icon, Toast } from 'native-base'
 import ip from './ip'
@@ -34,6 +34,7 @@ state={
     //   form validation.....
 
     _name(v){
+        this.setState({error:false})
         if(v.length > 2){
             this.setState({name:v,nameError:null})
         }else{
@@ -42,6 +43,7 @@ state={
     }
 
     _email(v){
+        this.setState({error:false})
          let emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
         let test = emailRegex.test(v)
@@ -53,6 +55,7 @@ state={
     }
 
     _password(v){
+        this.setState({error:false})
         if(v.length > 5){
             this.setState({password:v,passwordError:null})
         }else{
@@ -61,6 +64,7 @@ state={
     }
 
     _confirmPassword(v){
+        this.setState({error:false})
         let { password } = this.state
         if(v === password){
             this.setState({confirmPassword:v,confirmPasswordError:null})
@@ -96,12 +100,13 @@ state={
     }
 
     _signup(){
+        this.setState({error:false})
         console.log('chala')
         
         let {name,email,password,selected} = this.state
         
 
-            fetch(`http://${ip}:3000/users/register`, {
+            fetch(`https://pacific-shore-10571.herokuapp.com/users/register`, {
                 method: 'POST',
   headers: {
       'Content-Type': 'application/json'
@@ -116,6 +121,7 @@ state={
       
     //   Toast.show({ text: "Registration successful..",
     //           position: "top", type: "success"})
+    this.setState({error:false})
 
               setTimeout(()=>{
                   this.props.navigation.navigate('SignIn')
@@ -131,7 +137,7 @@ state={
     }
 
 render(){
-let { selectedError,nameError,emailError,passwordError,confirmPasswordError, loader } = this.state;
+let { selectedError,nameError,emailError,passwordError,confirmPasswordError, loader, error } = this.state;
     return(
 
 <ScrollView centerContent={true} >
@@ -168,11 +174,17 @@ let { selectedError,nameError,emailError,passwordError,confirmPasswordError, loa
             </Picker>
             {selectedError && <Text  style={styles.errorText}> {selectedError}</Text>}
 
-               {loader && <ProgressBarAndroid  />}
-
-            <TouchableOpacity onPress={()=>this._checkPost()} style={styles.btn}>
-                <Text style={styles.btnText} >Submit</Text>
+               {loader && 
+               <TouchableOpacity style={styles.btn}>
+               <ActivityIndicator color='#ef5350' />
             </TouchableOpacity>
+               }
+
+               {error && <Text  style={[styles.errorText,{marginTop:15}]}> {error} </Text>}
+
+            {!loader && <TouchableOpacity onPress={()=>this._checkPost()} style={styles.btn}>
+                <Text style={styles.btnText} >Submit</Text>
+            </TouchableOpacity>}
 
             <View style={{display:'flex',flexDirection:"row", justifyContent:'center',marginTop:40}}>
             <Text style={{color:'white',fontSize:15,alignSelf:'center',marginBottom:60}}>Already have an account? </Text>
@@ -202,11 +214,11 @@ const styles = StyleSheet.create({
     input:{
         backgroundColor:'white',
         width:300,
-        height:40,
-        marginTop:20,
+        height:38,
+        marginTop:15,
         borderRadius:5,
         alignSelf:'center',
-        fontSize:16,
+        fontSize:15,
         marginLeft:15,
         marginRight:15
     },

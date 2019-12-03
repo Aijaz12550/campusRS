@@ -1,21 +1,17 @@
 import React , { Component } from 'react'
 import {
-View, Text, TouchableOpacity, TextInput, StyleSheet,SafeAreaView,Dimensions,ScrollView,StatusBar, ImageBackground, Animated, PanResponder
+View, Text, TouchableOpacity, StyleSheet,Dimensions,StatusBar,  Animated, PanResponder
 } from "react-native"
- import Svg from "react-native-svg"
 import Modal from 'react-native-modal'
 import { DrawerActions } from 'react-navigation-drawer';
+
 import { connect } from 'react-redux'
-// import { Add_User,Remove_User} from '../store/actions/index'
 import { Add_User,Remove_User} from '../../store/actions/index'
-import ip from '../ip'
-import img from '../company/image'
+
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
-import { faRemoveFormat, faBox , faBoxOpen, faList, faBuilding, faUsers, faUser } from '@fortawesome/free-solid-svg-icons'
+import {faBoxOpen,faUser } from '@fortawesome/free-solid-svg-icons'
+
 import { FlatList } from 'react-native-gesture-handler';
-
-
-
 
 
  class Home extends Component {
@@ -87,26 +83,6 @@ import { FlatList } from 'react-native-gesture-handler';
          }
          
      })
-
-     this.Pan = PanResponder.create({
-        onStartShouldSetPanResponder:(evt,gestureState)=>true,
-        onPanResponderMove:(evt,gestureState)=>{
-            console.log('pan',gestureState.dx,"y>>",gestureState.dy,evt)
-         this.pos.setValue({
-             x : gestureState.dx,
-             y:gestureState.dy
-         })
-        },
-        onPanResponderRelease:(evt,gestureState)=>{
-               if(gestureState.dx > 110){
-                   this.setState({modal:true})
-                   this.pos.setValue({
-                       x:0,y:0
-                   })
-               }
-        }
-        
-    })
  }
 
  componentDidMount(){
@@ -160,8 +136,8 @@ import { FlatList } from 'react-native-gesture-handler';
 data={companyCount}
 renderItem={({item})=>
            <Animated.View 
-           {...this.PanResponder.panHandlers}
-           style={[{transform:this.position.getTranslateTransform()},styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} onPress={()=>this.props.navigation.dispatch(DrawerActions.openDrawer())}>
+           
+           style={[styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} onPress={()=>this.props.navigation.dispatch(DrawerActions.openDrawer())}>
                    <View style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:10,flexDirection:'column'}}>
                        <FontAwesomeIcon icon={faUser} size={25} color="#296" />
                        <Text style={{fontSize:16,fontWeight:'bold',color:"#296"}}> {item.name} </Text>

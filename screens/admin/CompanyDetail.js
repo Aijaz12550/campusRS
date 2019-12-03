@@ -167,8 +167,8 @@ import { faRemoveFormat, faBox , faBoxOpen, faList, faBuilding, faUsers,faPerson
     <FlatList
     data={companies?companies.activeJobs:[]}
     renderItem={({item})=> <Animated.View 
-        {...this.PanResponder.panHandlers}
-        style={[{transform:this.position.getTranslateTransform()},styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} onPress={()=>this.props.navigation.dispatch(DrawerActions.openDrawer())}>
+        
+        style={[styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]} onPress={()=>this.props.navigation.dispatch(DrawerActions.openDrawer())}>
                 <View style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:10,flexDirection:'column'}}>
                     <FontAwesomeIcon icon={faPersonBooth} size={25} color="#296" />
     <Text style={{fontSize:16,fontWeight:'bold',color:"#296"}}>{item.title}</Text>

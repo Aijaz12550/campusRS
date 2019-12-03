@@ -124,11 +124,11 @@ renderItem={({item})=>
             <Text style={{fontSize:16,fontWeight:'bold',color:"white"}}> {item.applicant_id.name} </Text>
         </View>
         <View style={{borderBottomColor:"#eee",borderBottomWidth:1,paddingBottom:5}}> 
-            <Text style={{fontSize:16,fontWeight:'bold',color:'white'}}>Last degree : {item.applicant_id.cv.degree}</Text>
+            <Text style={{fontSize:16,fontWeight:'bold',color:'white'}}>Last degree : {item.cv_id && item.cv_id.degree}</Text>
             <View>
-          <Text style={{color:'white',fontSize:16}} >skills : {item.applicant_id.cv.skills}</Text>
-          <Text style={{color:'white',fontSize:16}} >Degree Completion Year : {item.applicant_id.cv.year}</Text>
-          <Text style={{color:'white',fontSize:16}} >Description : {item.applicant_id.cv.des}</Text>
+          <Text style={{color:'white',fontSize:16}} >skills : {item.cv_id && item.cv_id.skills}</Text>
+          <Text style={{color:'white',fontSize:16}} >Degree Completion Year : {item.cv_id && item.cv_id.year}</Text>
+          <Text style={{color:'white',fontSize:16}} >Description : {item.cv_id && item.cv_id.des}</Text>
 
           <View style={{}}>
     <Text style={{padding:5,color:'#eee',fontWeight:'bold',marginTop:10}}>Experience  :  </Text>
@@ -140,7 +140,7 @@ renderItem={({item})=>
      <Text style={{padding:5,paddingLeft:5,color:'#296',fontWeight:'bold',width:100,fontSize:12}}> Organization </Text>
     </View>
 
-{ item.applicant_id.cv.experience && item.applicant_id.cv.experience.map( ( val, key )=>{
+{ item.cv_id && item.cv_id.experience && item.cv_id.experience.map( ( val, key )=>{
     return(
 
     <View style={{backgroundColor:'#eee',marginBottom:5,flexDirection:'row'}}>

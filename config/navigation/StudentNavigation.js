@@ -12,6 +12,10 @@ const MyJobs = createStackNavigator({
     MyJobs : Routes.MyJobs
 })
 
+const Editcv = createStackNavigator({
+    Editcv : Routes.EditCv
+})
+
 const CV = createStackNavigator({
     CV : Routes.AddCv
 })
@@ -36,7 +40,8 @@ const drawer = createDrawerNavigator({
     },
     MyCv:{
         screen:Mycv
-    }
+    },
+    Editcv:Editcv
 
     
 },

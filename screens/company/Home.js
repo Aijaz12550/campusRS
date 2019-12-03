@@ -20,7 +20,7 @@ import ip from '../ip'
  class Home extends Component {
     state={
         login:false,main:true,
-        WIDTH:300,refreshing:false, setRefreshing:false
+        WIDTH:300,refreshing:false, setRefreshing:false,showSentence:false,companies:[],
     }
     constructor(props){
         super(props);
@@ -80,7 +80,7 @@ import ip from '../ip'
            })
        }).then(res=>res.json())
        .then(data=>{
-           this.setState({companies:data.result})
+           this.setState({companies:data.result,showSentence:true})
            this.setState({refreshing: false});
            console.log('~~myCompany~~~~',data)
        }).catch(e=>{
@@ -96,7 +96,7 @@ import ip from '../ip'
     },10000)
   }
     render(){
-        let { login,main, companies,refreshing, setRefreshing } = this.state
+        let { login,main, companies,refreshing, setRefreshing, showSentence } = this.state
         
 const DATA = [
     {
@@ -125,12 +125,20 @@ const DATA = [
             <View style={{flex:1,backgroundColor:'#eee'}}>
 <StatusBar backgroundColor="#ef5350" barStyle="light-content" />
 
-{ !companies && <ScrollView style={{flex:1,backgroundColor:'lightgray'}}  refreshControl={
+{ !companies.length  && <ScrollView style={{flex:1,backgroundColor:'lightgray'}} 
+contentContainerStyle={{justifyContent:'center',alignItems:'center',padding:20}}
+refreshControl={
                         <RefreshControl
                           refreshing={this.state.refreshing}
                           onRefresh={this._onRefresh}
                         />
-                      } ></ScrollView>}
+                    } >
+
+                    { !companies.length  && showSentence && <Text style={{alignSelf:'center'}}>
+                        You don't have any Registered Company.Please Click
+                     " + " button at bottom and Add your Company.
+                     </Text>}
+                          </ScrollView>}
 
 <View style={styles.container}>
                        <FlatList

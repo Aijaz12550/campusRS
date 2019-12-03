@@ -1,7 +1,7 @@
 import React , { Component } from 'react'
 import {
 View, Text, TouchableOpacity, TextInput, 
-StyleSheet,SafeAreaView,Dimensions,ScrollView,StatusBar, FlatList, ListItem, RefreshControl
+StyleSheet,SafeAreaView,Dimensions,ScrollView,StatusBar, FlatList, ListItem, RefreshControl, ActivityIndicator
 } from "react-native"
  import Svg from "react-native-svg"
 import Modal from 'react-native-modal'
@@ -19,7 +19,7 @@ import Add_Cv from '../../store/actions/CvAction';
     state={
         login:false,main:true,
         WIDTH:300,refreshing:false, setRefreshing:false,heart:false,search:false,
-        resultArray:[],v:null,more:false,detailDekhao:false,
+        resultArray:[],v:null,more:false,detailDekhao:false, applied:false,liked:false
     }
     constructor(props){
         super(props);
@@ -197,6 +197,7 @@ async _deleteAction(action_id){
 
 //   -------apply for job---
  async _applyJob(cId,jobId){
+     this.setState({applied:true,jobId})
      if(this.props.cv){
 
          console.log('chhh',jobId)
@@ -208,16 +209,19 @@ async _deleteAction(action_id){
          },
          body:JSON.stringify({
             applicant_id:this.props.user._id,
+            cv_id:this.props.user._id,
             company_id :cId,
             job_id:jobId,
             status:"Pending",
          })
      }).then( res => res.json()).then( aijaz => {
          console.log('---aijaz',aijaz)
+         this.setState({applied:false})
          if(aijaz.result){
              this._updateJob(aijaz.result._id,jobId)
          }
      }).catch( e => {
+        this.setState({applied:false})
          console.log('__error',e)
         })
     }else{
@@ -226,9 +230,9 @@ async _deleteAction(action_id){
  }
 
     render(){
-        let { login,main, companies,refreshing, setRefreshing,comps, heart, search,v,resultArray, dd, detailDekhao } = this.state
+        let {comps, heart, search,v,resultArray, dd, detailDekhao, applied,jobId, liked } = this.state
         // console.log('jjjjjjjjjjjjjj',this.props.cv)
-        
+        let flag = false
 
 
   function Item({ title }) {
@@ -313,7 +317,7 @@ renderItem={({ item }) => <TouchableOpacity style={[styles.card,{width:this.stat
  <Text> Posted : {moment(JSON.parse(item.timestamp)).fromNow()}</Text>
 <Text> Required Qualification : {item.required_qualification}</Text>
 <Text> Required Experience : {item.experience}</Text>
-
+{flag = false}
 {detailDekhao == item._id &&
 <View>
 <Text> Job Type : {item.job_type}</Text>
@@ -339,8 +343,9 @@ renderItem={({ item }) => <TouchableOpacity style={[styles.card,{width:this.stat
 {
 
 item.applications.map((val,key)=>{
+    console.log('...',item.applications.length)
+    let len = item.applications.length
     
-    let flag = false
     if(  val.applicant_id === this.props.user._id ){
         flag = true;
         return(
@@ -349,21 +354,34 @@ item.applications.map((val,key)=>{
             <FontAwesomeIcon   color="#296" icon={faCheckCircle} />
             <Text style={{fontSize:8,color:"#296"}}>Applied</Text>
                 </View>
-        <Text style={{marginLeft:5}} >{item.applications.length}</Text>
+        <Text style={{marginLeft:5}} >{len}</Text>
             </TouchableOpacity>
         )
     }
    else if(key === item.applications.length - 1 && !flag) {
+       
     //    console.log('11111111111111',item._id)
+    if(!applied){
+
         return(
             <TouchableOpacity style={{display:'flex',flexDirection:'row',justifyContent:'center'}} onPress={()=>this._applyJob(item.cId,item._id)} >
           <View>
             <FontAwesomeIcon   icon={faCheckCircle} />
             <Text style={{fontSize:8,color:"black"}}> Apply</Text>
                 </View>
-        <Text style={{marginLeft:5}} >{item.applications.length}</Text>
+        <Text style={{marginLeft:5}} >{len}</Text>
             </TouchableOpacity>
-        )
+
+)
+}else if(applied && jobId == item._id){
+    return(
+        <TouchableOpacity style={{display:'flex',flexDirection:'row',justifyContent:'center'}}  >
+      <ActivityIndicator  color="#296" />
+        </TouchableOpacity>
+
+)
+}
+            
     }
     
 })
@@ -405,6 +423,7 @@ item.actions.map((val,key)=>{
         )
     }
    else if(key === item.actions.length - 1 && !flag) {
+       
         return(
             <TouchableOpacity style={{display:'flex',flexDirection:'row'}} key={key} onPress={()=>this._newAction(true,item._id,false,key)} >
                 <View>
@@ -464,7 +483,6 @@ keyExtractor={item => item._id}
 
   
 }
-
 
                   {v && <FlatList
                   ListEmptyComponent={()=><Text>No Job Found for {v}</Text>}

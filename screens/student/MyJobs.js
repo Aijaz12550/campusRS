@@ -244,8 +244,9 @@ keyExtractor={item => item._id}
 <View>{
     v.applications.length ? v.applications.map((nes,nesk)=>{
         console.log("nes.u.",nes.applicant_id == this.props.user._id)
-        
-        return(<View style={[styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]}>
+        if(nes.applicant_id == this.props.user._id){
+
+            return(<View style={[styles.card,{width:this.state.WIDTH},{shadowOffset:{  width: 30,  height: 30,  },shadowColor:'black',shadowOpacity:1}]}>
 
             <TouchableOpacity  >
             <View style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:10}}>
@@ -287,7 +288,7 @@ keyExtractor={item => item._id}
 ?
 <View>
 {
-
+    
 v.actions.map((val,key)=>{
     // let array = ["v.actions","ewewe","v.actions","ewewe"]
     // let test = array.splice(2,1)
@@ -305,7 +306,7 @@ v.actions.map((val,key)=>{
         </TouchableOpacity>
         )
     }
-   else if(key === v.actions.length - 1 && !flag) {
+    else if(key === v.actions.length - 1 && !flag) {
         return(
             <TouchableOpacity style={{display:'flex',flexDirection:'row'}} key={key} onPress={()=>this._newAction(true,v._id,false,key)} >
                 <View>
@@ -340,7 +341,7 @@ v.actions.map((val,key)=>{
 
 
 <TouchableOpacity onPress={()=>this.setState({detailDekhao:false})}  >
-<FontAwesomeIcon  size={20} color='navy' icon={faArrowAltCircleUp} />
+    <FontAwesomeIcon  size={20} color='navy' icon={faArrowAltCircleUp} />
 <Text  style={{fontSize:10,color:"navy"}}> less</Text>
 </TouchableOpacity>
 }
@@ -350,6 +351,7 @@ v.actions.map((val,key)=>{
             </View>
            )
            
+        }
         })
         :<View></View>
     }</View>
@@ -456,7 +458,7 @@ const styles = StyleSheet.create({
         flex:0.9,
         backgroundColor:'#ef5350',
         elevation:15,
-        height:40,
+        height:35,
         color:'white',
         paddingLeft:10,
         paddingRight:10,

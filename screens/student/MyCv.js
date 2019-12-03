@@ -1,12 +1,13 @@
 import React , { Component } from 'react'
 import {
-View, Text, TouchableOpacity, TextInput, StyleSheet,SafeAreaView,Dimensions,ScrollView,StatusBar,DatePickerAndroid
+View, Text, TouchableOpacity, TextInput, StyleSheet,SafeAreaView,Dimensions,ScrollView,StatusBar,DatePickerAndroid,RefreshControl
 } from "react-native"
  import Svg from "react-native-svg"
 import Modal from 'react-native-modal'
 import { DrawerActions } from 'react-navigation-drawer';
 import { connect } from 'react-redux'
 // import { Add_User,Remove_User} from '../store/actions/index'
+import Add_Cv from '../../store/actions/CvAction'
 import { Add_User,Remove_User} from '../../store/actions/index'
 import { Picker, Icon } from 'native-base'
 import ip from '../ip'
@@ -71,8 +72,36 @@ import ip from '../ip'
     }
  };
 
+ _onRefresh = () => {
+    this.setState({refreshing: true});
+    this._mycv()
+    setTimeout(()=>{
+        this.setState({refreshing: false})
+    },10000)
+  }
+
+
+ 
+ async _mycv(){
+    await fetch(`https://pacific-shore-10571.herokuapp.com/users/mycv`,{
+        method:'GET',
+        headers:{
+            "Content-Type":'application/json',
+            authorization:`Bearer ${this.props.user.token}`,
+            id:this.props.user._id
+        }
+    }).then( res => res.json()).then( data => {
+        console.log('ff',data)
+        this.props.add_cv(data.result)
+        this.setState({refreshing: false})
+    }).catch( e => {
+        console.log('eee',e)
+    })
+}
+
  componentDidMount(){
-     console.log('~~props~~',this.props)
+     console.log('~~props~~',this.props.cv)
+     this._mycv()
  }
 
  onValueChange(value) {
@@ -83,7 +112,7 @@ import ip from '../ip'
 
 
     render(){
-        let { name, skills, year, degree, des, experience,  } = this.props.cv
+        let { name, skills, year, degree, des, experience,  } = this.props.cv;
 
         /**
          * {"__v": 0, "_id": "5dd4134a15baa6343c26fb4b", "degree": "Bachelor", "des": "Gdhdhdhdddhdj", 
@@ -96,10 +125,17 @@ console.log("-------------",this.props.cv)
         return(
             <View style={{flex:1}}>
 <StatusBar backgroundColor="#ef5350" barStyle="light-content" />
+
 <View style={styles.container}>
 
-
-<View style={{justifyContent:"center",borderRadius:15}}> 
+{  <ScrollView style={{flex:1,backgroundColor:'lightgray'}}  refreshControl={
+                        <RefreshControl
+                          refreshing={this.state.refreshing}
+                          onRefresh={this._onRefresh}
+                        />
+                      } >
+                          <View style={{flex:0.51}}></View>
+<View style={{justifyContent:"center",borderRadius:15,marginTop:40}}> 
 
 
     <View style={{flexDirection:'row',backgroundColor:'#eee',borderRadius:10,borderBottomColor:'gray',borderBottomWidth:1}}>
@@ -109,7 +145,7 @@ console.log("-------------",this.props.cv)
 
 
     <View style={{flexDirection:'row',backgroundColor:'#eee',borderRadius:10,borderBottomColor:'gray',borderBottomWidth:1}}>
-    <Text style={{padding:5}}> Skills :  </Text>
+        <Text style={{padding:5}}> Skills :  </Text>
      <Text style={{padding:5,paddingLeft:5,color:'#296'}}> {skills} </Text>
     </View>
 
@@ -121,7 +157,7 @@ console.log("-------------",this.props.cv)
 
 
     <View style={{flexDirection:'row',backgroundColor:'#eee',borderRadius:10,borderBottomColor:'gray',borderBottomWidth:1}}>
-    <Text style={{padding:5}}> Degree Completion Year  :  </Text>
+        <Text style={{padding:5}}> Degree Completion Year  :  </Text>
      <Text style={{padding:5,paddingLeft:5,color:'#296'}}> {year} </Text>
     </View>
 
@@ -138,7 +174,7 @@ console.log("-------------",this.props.cv)
 
 { experience && experience.map( ( val, key )=>{
     return(
-
+        
     <View style={{backgroundColor:'#eee',borderRadius:10,marginBottom:5,flexDirection:'row'}}>
     <Text style={{padding:5,paddingLeft:5,color:'#000',width:50}}> {key + 1} . </Text>
      <Text style={{padding:5,paddingLeft:5,color:'#000',width:100}}> {val.designation} </Text>
@@ -152,10 +188,11 @@ console.log("-------------",this.props.cv)
 
 
 </View>
-<TouchableOpacity onPress={()=>this.props.navigation.navigate('CV')} style={{marginTop:40,backgroundColor:'#ef5350',padding:10,width:200,alignItems:'center',borderBottomEndRadius:30,
-    borderTopStartRadius:30,}}>
-    <Text style={{color:'white'}} >Edit</Text>
+<TouchableOpacity onPress={()=>this.props.navigation.navigate('Editcv')} style={{marginTop:40,backgroundColor:'#ef5350',padding:10,width:200,alignItems:'center',borderBottomEndRadius:30,
+    borderTopStartRadius:30,alignSelf:'center'}}>
+    <Text style={{color:'white',alignSelf:'center',textAlign:'center'}} >Edit</Text>
 </TouchableOpacity>
+    </ScrollView>}
 </View>
 
             </View>
@@ -256,7 +293,8 @@ const mapStateToProps = state =>{
 
 const mapDispatchToProps = dispatch =>{
     return{
-        add_user : (user)=>dispatch(Add_User(user))
+        add_user : (user)=>dispatch(Add_User(user)),
+        add_cv:(cv)=>dispatch(Add_Cv(cv))
     }
 }
 export default connect(mapStateToProps,mapDispatchToProps)(My_CV)
