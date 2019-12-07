@@ -16,7 +16,6 @@ import img from './image'
 import Pending from './jobs/pending'
 import ShortList from './jobs/shortlisted'
 import Selected from './jobs/selected'
-import ip from '../ip'
 
   
 
